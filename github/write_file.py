@@ -45,4 +45,4 @@ def write_file(repo: str, path: str, content: str, message: str = None) -> dict:
 
 
 if __name__ == "__main__":
-    write_file("Snupkindeker/vibecoding-machine", "eggs/test.txt", "print('Hi!'")
+    write_file("Snupkindeker/vibecoding-machine", "test.txt", "print('Hi!')")
