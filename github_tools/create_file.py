@@ -13,13 +13,18 @@ def create_file(repo: str, path: str, content: str, message: str = None, branch:
     if not github_key:
         raise ValueError("The GitHub PAT is invalid. Please provide a valid GitHub PAT to the GITHUB_PAT environment variable.")
 
-    check_url = f"https://api.github.com/repos/{repo}/contents/{path}"
-    headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github.v3+json"}
-    resp = requests.get(check_url, headers=headers)
-    if resp.status_code == 200:
-        raise requests.exceptions.HTTPError(f"The {path} file already exists. Use write_file to rewrite it.")
-    elif resp.status_code != 404:
-        resp.raise_for_status()
+    try:
+        check_url = f"https://api.github.com/repos/{repo}/contents/{path}"
+        headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github_tools.v3+json"}
+        resp = requests.get(check_url, headers=headers)
+        if resp.status_code == 200:
+            raise Exception(f"The {path} file already exists. Use write_file to rewrite it.")
+        elif resp.status_code != 404:
+            resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(e)
+
+    print("Step 1 success")
 
     encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
     payload = {
@@ -31,3 +36,7 @@ def create_file(repo: str, path: str, content: str, message: str = None, branch:
     resp_put = requests.put(put_url, headers=headers, json=payload)
     resp_put.raise_for_status()
     return resp_put.json()
+
+
+if __name__ == "__main__":
+    create_file("Snupkindeker/TestRepo", "test.txt", "Hi!")

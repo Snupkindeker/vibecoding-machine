@@ -17,7 +17,7 @@ def write_file(repo: str, path: str, content: str, message: str = None) -> dict:
 
     sha = None
     get_url = f"https://api.github.com/repos/{repo}/contents/{path}"
-    headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github.v3+json"}
+    headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github_tools.v3+json"}
     resp = requests.get(get_url, headers=headers)
     if resp.status_code == 200:
         sha = resp.json().get("sha")

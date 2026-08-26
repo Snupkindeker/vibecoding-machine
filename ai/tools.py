@@ -4,7 +4,11 @@ import requests
 from dotenv import load_dotenv
 from os import getenv
 
-import github
+from github_tools.create_file import create_file
+from github_tools.create_repo import create_repo
+from github_tools.get_file_list import get_file_list
+from github_tools.read_file import read_file
+from github_tools.write_file import write_file
 
 
 load_dotenv()
@@ -233,11 +237,11 @@ tools = [
 TOOL_MAPPING = {
     "web_search": web_search,
     "get_datetime": get_datetime,
-    "create_file": github.create_file.create_file,
-    "create_repo": github.create_repo.create_repo,
-    "get_file_list": github.get_file_list.get_file_list,
-    "read_file": github.read_file.read_file,
-    "write_file": github.write_file.write_file
+    "create_file": create_file,
+    "create_repo": create_repo,
+    "get_file_list": get_file_list,
+    "read_file": read_file,
+    "write_file": write_file
 }
 
 

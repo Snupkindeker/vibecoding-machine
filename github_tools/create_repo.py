@@ -15,13 +15,17 @@ def create_repo(name: str, public: bool = False) -> dict:
     url = "https://api.github.com/user/repos"
     headers = {
         "Authorization": f"token {github_key}",
-        "Accept": "application/vnd.github.v3+json"
+        "Accept": "application/vnd.github_tools.v3+json"
     }
     payload = {
-            "name": name,
-            "private": not public
+        "name": name,
+        "private": not public
     }
 
     response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
     return response.json()
+
+
+if __name__ == "__main__":
+    create_repo("TestRepo", True)

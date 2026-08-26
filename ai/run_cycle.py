@@ -1,5 +1,3 @@
-import os
-
 import openai
 from httpx import Client
 
@@ -20,43 +18,56 @@ ai_client = openai.OpenAI(
     http_client=http_client
 )
 
-def call_llm(msgs):
-    resp = ai_client.chat.completions.create(
-        model="google/gemini-3-flash-preview",
-        tools=tools,
-        messages=msgs
-    )
-    msgs.append(resp.choices[0].message.dict())
-    return resp
 
-def get_tool_response(response):
-    tool_call = response.choices[0].message.tool_calls[0]
-    tool_name = tool_call.function.name
-    tool_args = json.loads(tool_call.function.arguments)
+def run_cycle(messages: list[dict[str, str]]) -> list[dict[str, str]]:
+    def call_llm(msgs):
+        resp = ai_client.chat.completions.create(
+            model="deepseek-v4-flash-0731",
+            tools=tools,
+            messages=msgs
+        )
+        msgs.append(resp.choices[0].message.model_dump())
+        return resp
 
-    # Look up the correct tool locally, and call it with the provided arguments
-    # Other tools can be added without changing the agentic loop
-    tool_result = TOOL_MAPPING[tool_name](**tool_args)
+    def get_tool_response(response):
+        tool_call = response.choices[0].message.tool_calls[0]
+        tool_name = tool_call.function.name
+        tool_args = json.loads(tool_call.function.arguments)
 
-    return {
-        "role": "tool",
-        "tool_call_id": tool_call.id,
-        "content": tool_result,
-    }
+        tool_result = TOOL_MAPPING[tool_name](**tool_args)
+        content = json.dumps(tool_result, ensure_ascii=False)
 
-max_iterations = 10
-iteration_count = 0
+        return {
+            "role": "tool",
+            "tool_call_id": tool_call.id,
+            "content": content
+        }
 
-while iteration_count < max_iterations:
-    iteration_count += 1
-    resp = call_llm(_messages)
+    max_iterations = 25
+    iteration_count = 0
 
-    if resp.choices[0].message.tool_calls is not None:
-        messages.append(get_tool_response(resp))
-    else:
-        break
+    while iteration_count < max_iterations:
+        iteration_count += 1
+        resp = call_llm(messages)
 
-if iteration_count >= max_iterations:
-    print("Warning: Maximum iterations reached")
+        print(resp.choices[0].message.tool_calls)
+        if resp.choices[0].message.tool_calls is not None:
+            messages.append(get_tool_response(resp))
+        else:
+            break
 
-print(messages[-1]['content'])
+    if iteration_count >= max_iterations:
+        print("Warning: Maximum iterations reached")
+
+    print(messages[-1]['content'])
+    return messages
+
+
+if __name__ == "__main__":
+    messages = [
+        {
+            "role": "user",
+            "content": "Hi! Could you please use your github tools to create a private repo for me? Name it TestRepa, create a hello.py file in it and write print('Hello World!') inside. My github username is Snupkindeker.",
+        }
+    ]
+    run_cycle(messages)

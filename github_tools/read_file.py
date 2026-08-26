@@ -14,7 +14,7 @@ def read_file(repo: str, path: str) -> str:
         raise ValueError("The GitHub PAT is invalid. Please provide a valid GitHub PAT to the GITHUB_PAT environment variable.")
 
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
-    headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github.v3+json"}
+    headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github_tools.v3+json"}
     resp = requests.get(url, headers=headers)
     resp.raise_for_status()
     data = resp.json()

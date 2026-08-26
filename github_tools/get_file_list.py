@@ -13,7 +13,7 @@ def get_file_list(repo: str, path: str = "") -> list:
         raise ValueError("Токен не найден")
 
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
-    headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github.v3+json"}
+    headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github_tools.v3+json"}
     resp = requests.get(url, headers=headers)
     resp.raise_for_status()
     items = resp.json()
