@@ -1,6 +1,7 @@
 import openai
 from httpx import Client
 
+from system_context import make_context, system_context
 from tools import *
 
 
@@ -64,10 +65,11 @@ def run_cycle(messages: list[dict[str, str]]) -> list[dict[str, str]]:
 
 
 if __name__ == "__main__":
-    messages = [
-        {
-            "role": "user",
-            "content": "Hi! Could you please use your github tools to create a private repo for me? Name it TestRepa, create a hello.py file in it and write print('Hello World!') inside. My github username is Snupkindeker.",
-        }
-    ]
-    run_cycle(messages)
+    messages = [system_context()]
+    query = ""
+    while True:
+        query = make_context("user", input("Insert your message here: "))
+        if query['content'] == "/stop":
+            break
+        messages.append(query)
+        messages = run_cycle(messages)
