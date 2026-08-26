@@ -1,7 +1,52 @@
-# ---------------------------------------------------- AI Config ------------------------------------------------------
+from exceptions.config_error import ConfigError
+
+
+# -------------------------------------------------- AI Config --------------------------------------------------------
 # Here you can change your preferences on AI responses.
+
 
 github_username: str = "Snupkindeker" # Put your GitHub username here, this is required for the AI GitHub tools to work.
 coding_case: str = "snake" # Change to "snake" for snake_case, "camel" for camelCase or "pascal" for PascalCase.
-use_markdown: bool = True # Decides whether AI should use MarkDown or not.
+use_markdown: bool = True # Decides whether AI should use Markdown or not.
 preferred_languages: list[str] = [] # Put preferred programming languages in the list. Empty means use any language.
+
+
+# ------------------------------------------------ Config checker -----------------------------------------------------
+def check_config() -> None: # Checks all config values and raises ConfigError if something is wrong
+    if type(github_username) != str:
+        raise ConfigError("Invalid github username")
+    if type(coding_case) != str:
+        raise ConfigError("Invalid coding case")
+    if coding_case not in ["snake", "camel", "pascal"]:
+        raise ConfigError("Invalid coding case")
+    if type(use_markdown) != bool:
+        raise ConfigError("Invalid markdown usage setting")
+    if type(preferred_languages) != list:
+        raise ConfigError("Invalid preferred languages setting")
+    if len(preferred_languages) > 20:
+        raise ConfigError("Too many preferred languages")
+    for language in preferred_languages:
+        if type(language) != str:
+            raise ConfigError("Invalid preferred languages setting")
+
+# ------------------------------------------------ Set to default -----------------------------------------------------
+def set_default_config() -> None:
+    global github_username
+    global coding_case
+    global use_markdown
+    global preferred_languages
+
+    github_username = "Snupkindeker"
+    coding_case = "snake"
+    use_markdown = True
+    preferred_languages = []
+
+
+# --------------------------------------------------- Testing ---------------------------------------------------------
+if __name__ == "__main__":
+    try:
+        check_config()
+    except ConfigError as e:
+        print(e)
+        set_default_config()
+    print(coding_case)
