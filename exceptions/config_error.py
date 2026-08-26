@@ -6,6 +6,6 @@ class ConfigError(Exception):
             self.message = None
     def __str__(self):
         if self.message:
-            return self.message
+            return f"ConfigError: {self.message}"
         else:
-            return "Config Error"
+            return "ConfigError"
