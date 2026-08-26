@@ -111,7 +111,7 @@ def set_license(license_type: str, years: str, username: str, repo: str) -> str:
 
     with open(f"{licenses_path}/{license_type}.txt", 'r') as f:
         text = f.read().replace("{YEAR}", years).replace("{USERNAME}", username)
-    file_list = get_file_list(repo, '.')
+    file_list = get_file_list(repo, '.')['files']
     if "LICENSE.md" in file_list:
         delete_file(repo, "LICENSE.md")
 
