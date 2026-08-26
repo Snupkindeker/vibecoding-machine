@@ -29,7 +29,6 @@ def delete_file(repo: str, path: str, message: str = None, branch: str = "main")
     if not sha:
         raise Exception(f"Could not retrieve SHA for '{path}'")
 
-    # 2. Удалить файл
     delete_url = f"https://api.github.com/repos/{repo}/contents/{path}"
     payload = {
         "message": message or f"Delete {path} via API",

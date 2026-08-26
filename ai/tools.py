@@ -6,6 +6,7 @@ from os import getenv
 
 from github_tools.create_file import create_file
 from github_tools.create_repo import create_repo
+from github_tools.delete_file import delete_file
 from github_tools.get_file_list import get_file_list
 from github_tools.read_file import read_file
 from github_tools.write_file import write_file
@@ -158,6 +159,35 @@ tools = [
                     }
                 },
                 "required": ["name"]
+            }
+        }
+    },
+{
+        "type": "function",
+        "function": {
+            "name": "delete_file",
+            "description": "Delete a file with a given name in a given github repository.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "repo": {
+                        "type": "string",
+                        "description": 'The github repository name in User/Repo_name format (for example "Flowseal/zapret-discord-youtube").'
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": 'Path to the file you want to delete (for example "src/file.txt").'
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": 'The commit message.'
+                    },
+                    "branch": {
+                        "type": "string",
+                        "description": 'The repository branch name you want to delete the file in (for example "master"), defaults to "main".'
+                    }
+                },
+                "required": ["repo", "path", "content"]
             }
         }
     },
