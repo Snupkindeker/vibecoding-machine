@@ -11,12 +11,10 @@ github_key = getenv("GITHUB_PAT")
 
 def write_file(repo: str, path: str, content: str, message: str = None) -> dict:
     if not github_key:
-        raise ValueError("Токен не найден")
+        raise ValueError("The GitHub PAT is invalid. Please provide a valid GitHub PAT to the GITHUB_PAT environment variable.")
 
-    # Кодируем содержимое в base64
     encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
 
-    # Получаем SHA текущего файла, если он существует
     sha = None
     get_url = f"https://api.github.com/repos/{repo}/contents/{path}"
     headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github.v3+json"}
@@ -24,16 +22,15 @@ def write_file(repo: str, path: str, content: str, message: str = None) -> dict:
     if resp.status_code == 200:
         sha = resp.json().get("sha")
     elif resp.status_code != 404:
-        resp.raise_for_status()  # другая ошибка
+        resp.raise_for_status()
 
-    # Формируем payload для PUT
     if message is None:
         message = f"Update {path} via API" if sha else f"Create {path} via API"
 
     payload = {
         "message": message,
         "content": encoded,
-        "branch": "main"   # можно сделать параметром, но для простоты фиксируем
+        "branch": "main"
     }
     if sha:
         payload["sha"] = sha

@@ -11,13 +11,13 @@ github_key = getenv("GITHUB_PAT")
 
 def create_file(repo: str, path: str, content: str, message: str = None, branch: str = "main") -> dict:
     if not github_key:
-        raise ValueError("Токен не найден")
+        raise ValueError("The GitHub PAT is invalid. Please provide a valid GitHub PAT to the GITHUB_PAT environment variable.")
 
     check_url = f"https://api.github.com/repos/{repo}/contents/{path}"
     headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github.v3+json"}
     resp = requests.get(check_url, headers=headers)
     if resp.status_code == 200:
-        raise requests.exceptions.HTTPError(f"Файл {path} уже существует. Используйте write_file для обновления.")
+        raise requests.exceptions.HTTPError(f"The {path} file already exists. Use write_file to rewrite it.")
     elif resp.status_code != 404:
         resp.raise_for_status()
 

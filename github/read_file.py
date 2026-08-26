@@ -11,7 +11,7 @@ github_key = getenv("GITHUB_PAT")
 
 def read_file(repo: str, path: str) -> str:
     if not github_key:
-        raise ValueError("Токен не найден")
+        raise ValueError("The GitHub PAT is invalid. Please provide a valid GitHub PAT to the GITHUB_PAT environment variable.")
 
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
     headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github.v3+json"}
@@ -20,7 +20,7 @@ def read_file(repo: str, path: str) -> str:
     data = resp.json()
 
     if "content" not in data:
-        raise ValueError("Файл слишком большой, используйте download_url")
+        raise ValueError("The file is too big.")
     content = base64.b64decode(data["content"]).decode("utf-8")
     return content
 

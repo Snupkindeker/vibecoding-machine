@@ -10,7 +10,7 @@ github_key = getenv("GITHUB_PAT")
 
 def create_repo(name: str, public: bool = False) -> dict:
     if not github_key:
-        raise ValueError("Не передан GitHub токен и не установлена переменная окружения GITHUB_TOKEN")
+        raise ValueError("The GitHub PAT is invalid. Please provide a valid GitHub PAT to the GITHUB_PAT environment variable.")
 
     url = "https://api.github.com/user/repos"
     headers = {
