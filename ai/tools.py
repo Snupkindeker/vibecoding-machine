@@ -269,6 +269,7 @@ TOOL_MAPPING = {
     "get_datetime": get_datetime,
     "create_file": create_file,
     "create_repo": create_repo,
+    "delete_file": delete_file,
     "get_file_list": get_file_list,
     "read_file": read_file,
     "write_file": write_file
