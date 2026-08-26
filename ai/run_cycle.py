@@ -68,7 +68,7 @@ if __name__ == "__main__":
     messages = [system_context()]
     query = ""
     while True:
-        query = make_context("user", input("Insert your message here: "))
+        query = make_context("user", input("Type your message here: "))
         if query['content'] == "/stop":
             break
         messages.append(query)
