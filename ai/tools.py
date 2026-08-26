@@ -187,7 +187,7 @@ tools = [
                         "description": 'The repository branch name you want to delete the file in (for example "master"), defaults to "main".'
                     }
                 },
-                "required": ["repo", "path", "content"]
+                "required": ["repo", "path"]
             }
         }
     },
