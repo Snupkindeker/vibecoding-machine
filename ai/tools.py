@@ -72,6 +72,43 @@ def get_datetime(timezone: str) -> str | None:
 
     return data
 
+def set_license(license_type: str, years: str, username: str, repo: str) -> str:
+    if '-' in years:
+        year1 = years.split('-')[0].isdigit()
+        year2 = years.split('-')[1].isdigit()
+        if not (year1 and year2):
+            raise ValueError("Invalid years specified")
+        if int(year1) < 1900 or int(year2) < 1900 or int(year2) <= int(year1):
+            raise ValueError("Invalid years specified")
+    else:
+        if not years.isdigit():
+            raise ValueError("Invalid years specified")
+        if len(years) != 4 or int(years) < 1900:
+            raise ValueError("Invalid years specified")
+
+    if type(license_type) != str:
+        raise ValueError("Invalid license type specified")
+    if type(username) != str:
+        raise ValueError("Invalid username specified")
+
+    license_type = license_type.lower()
+
+    if license_type.lower() not in ['mit_license', 'apache_license_2.0']:
+        raise ValueError("Invalid license type specified")
+
+    with open(f"licenses/{license_type}.txt", 'r') as f:
+        text = f.read()
+    file_list = get_file_list(repo, '.')
+    if "LICENSE.md" in file_list:
+        delete_file(repo, "LICENSE.md")
+
+    if "LICENSE" in file_list:
+        write_file(repo, "LICENSE", text)
+    else:
+        create_file(repo, "LICENSE", text)
+
+    return f"Successfully set a(n) {license_type} for {username}'s {repo} repository."
+
 
 tools = [
     {
@@ -105,6 +142,35 @@ tools = [
                     }
                 },
                 "required": ["timezone"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "set_license",
+            "description": "Sets a license to a github repository",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "license_type": {
+                        "type": "string",
+                        "description": 'The license type. Supported license types: "mit_license", "apache_license_2.0"'
+                    },
+                    "years": {
+                        "type": "string",
+                        "description": 'The copyright year(s) in any of the 2 formats: 1) "2014-2026"; 2) "2026".'
+                    },
+                    "username": {
+                        "type": "string",
+                        "description": 'The github username for the copyright.'
+                    },
+                    "repo": {
+                        "type": "string",
+                        "description": 'The github repository name in User/Repo_name format (for example "Flowseal/zapret-discord-youtube").'
+                    }
+                },
+                "required": ["license_type", "years", "username", "repo"]
             }
         }
     },
@@ -267,6 +333,7 @@ tools = [
 TOOL_MAPPING = {
     "web_search": web_search,
     "get_datetime": get_datetime,
+    "set_license": set_license,
     "create_file": create_file,
     "create_repo": create_repo,
     "delete_file": delete_file,
