@@ -1,5 +1,18 @@
 import json
 import requests
+import sys
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(current_dir)
+
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+if root_dir not in sys.path:
+    sys.path.append(root_dir)
+
+licenses_path = os.path.join(root_dir, 'licenses')
+
 
 from dotenv import load_dotenv
 from os import getenv
@@ -96,8 +109,8 @@ def set_license(license_type: str, years: str, username: str, repo: str) -> str:
     if license_type.lower() not in ['mit_license', 'apache_license_2.0']:
         raise ValueError("Invalid license type specified")
 
-    with open(f"licenses/{license_type}.txt", 'r') as f:
-        text = f.read()
+    with open(f"{licenses_path}/{license_type}.txt", 'r') as f:
+        text = f.read().replace("{YEAR}", years).replace("{USERNAME}", username)
     file_list = get_file_list(repo, '.')
     if "LICENSE.md" in file_list:
         delete_file(repo, "LICENSE.md")
