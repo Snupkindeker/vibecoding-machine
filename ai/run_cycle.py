@@ -3,6 +3,7 @@ from httpx import Client
 
 from system_context import make_context, system_context
 from tools import *
+from config import model_name, model_operation_limit
 
 
 load_dotenv()
@@ -23,7 +24,7 @@ ai_client = openai.OpenAI(
 def run_cycle(messages: list[dict[str, str]]) -> list[dict[str, str]]:
     def call_llm(msgs):
         resp = ai_client.chat.completions.create(
-            model="deepseek-v4-flash-0731",
+            model=model_name,
             tools=tools,
             messages=msgs
         )
@@ -44,7 +45,7 @@ def run_cycle(messages: list[dict[str, str]]) -> list[dict[str, str]]:
             "content": content
         }
 
-    max_iterations = 25
+    max_iterations = model_operation_limit
     iteration_count = 0
 
     while iteration_count < max_iterations:
