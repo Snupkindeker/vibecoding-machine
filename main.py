@@ -12,3 +12,7 @@ def main():
             break
         messages.append(prompt)
         messages = run_cycle.run_cycle(messages)
+
+
+if __name__ == '__main__':
+    main()
