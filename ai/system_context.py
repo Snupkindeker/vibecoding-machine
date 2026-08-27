@@ -22,7 +22,7 @@ def system_context():
 5. Here are the user's preferences for your responses and works:
     1) their GitHub username is {github_username};
     2) their preferred coding case is the {coding_case} case;
-    3) they {"don't" if use_markdown else ""} want you to use markdown;
+    3) they do{" not" if use_markdown else ""} want you to use markdown;
     4) their preferred programming languages are {"any languages" if len(preferred_languages) == 0 else ', '.join(preferred_languages)}.
 6. Here are the system restrictions you have to follow:
     1) don't make any illegal/inappropriate software;
