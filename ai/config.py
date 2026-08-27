@@ -6,6 +6,7 @@ from exceptions.config_error import ConfigError
 
 
 model_name = "deepseek-v4-flash-0731" # Put the AI model name in here (and don't forget to change your API endpoint in .env if needed).
+model_operation_limit = 25 # How many actions (tool calls + reasoning) your model can do from one prompt. Set to -1 for no limit.
 github_username: str = "Snupkindeker" # Put your GitHub username here, this is required for the AI GitHub tools to work.
 coding_case: str = "snake" # Change to "snake" for snake_case, "camel" for camelCase or "pascal" for PascalCase.
 use_markdown: bool = True # Decides whether AI should use Markdown or not.
@@ -33,13 +34,17 @@ def check_config() -> None: # Checks all config values and raises ConfigError if
             raise ConfigError("Invalid preferred languages setting")
 
 # ------------------------------------------------ Set to default -----------------------------------------------------
-def set_default_config() -> None:
+def set_default_config(reset_username: bool = False) -> None:
+    global model_name
+    global model_operation_limit
     global github_username
     global coding_case
     global use_markdown
     global preferred_languages
 
-    github_username = "Snupkindeker"
+    model_name = "deepseek-v4-flash-0731"
+    model_operation_limit = 25
+    if reset_username: github_username = "Snupkindeker"
     coding_case = "snake"
     use_markdown = True
     preferred_languages = []
