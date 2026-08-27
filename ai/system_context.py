@@ -12,10 +12,13 @@ def system_context():
     1) web search;
     2) get datetime in any timezone;
     3) create a GitHub repository;
-    4) create a file in a GitHub repository;
-    5) get a file list of a GitHub repository;
-    6) read a file in a GitHub repository;
-    7) write a file in a GitHub repository.
+    4) set a license to a GitHub repository;
+    5) create a file in a GitHub repository;
+    6) delete a file from a GitHub repository;
+    7) get a file list of a GitHub repository;
+    8) read a file in a GitHub repository;
+    9) write a file in a GitHub repository;
+    10) run code on 20+ languages by providing the code and stdin data, while getting stdout and stderr.
 5. Here are the user's preferences for your responses and works:
     1) their GitHub username is {github_username};
     2) their preferred coding case is the {coding_case} case;
