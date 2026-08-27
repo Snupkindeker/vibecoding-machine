@@ -5,6 +5,7 @@ from exceptions.config_error import ConfigError
 # Here you can change your preferences on AI responses.
 
 
+model_name = "deepseek-v4-flash-0731" # Put the AI model name in here (and don't forget to change your API endpoint in .env if needed).
 github_username: str = "Snupkindeker" # Put your GitHub username here, this is required for the AI GitHub tools to work.
 coding_case: str = "snake" # Change to "snake" for snake_case, "camel" for camelCase or "pascal" for PascalCase.
 use_markdown: bool = True # Decides whether AI should use Markdown or not.
@@ -23,10 +24,12 @@ def check_config() -> None: # Checks all config values and raises ConfigError if
         raise ConfigError("Invalid markdown usage setting")
     if type(preferred_languages) != list:
         raise ConfigError("Invalid preferred languages setting")
-    if len(preferred_languages) > 20:
+    if len(preferred_languages) > 30:
         raise ConfigError("Too many preferred languages")
     for language in preferred_languages:
         if type(language) != str:
+            raise ConfigError("Invalid preferred languages setting")
+        if language not in ['assembly', 'bash', 'basic', 'c++', 'cpp', 'c#', 'csharp', 'c', 'go', 'java', 'js', 'javascript', 'kotlin', 'lua', 'pascal', 'php', 'python', 'ruby', 'rust', 'sql', 'sqlite', 'swift', 'typescript', 'visual_basic']:
             raise ConfigError("Invalid preferred languages setting")
 
 # ------------------------------------------------ Set to default -----------------------------------------------------
