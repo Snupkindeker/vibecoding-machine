@@ -63,10 +63,10 @@ def run_cycle(messages: list[dict[str, str]]) -> list[dict[str, str]]:
 
 if __name__ == "__main__":
     messages = [system_context()]
-    query = ""
+    prompt = ""
     while True:
-        query = make_context("user", input("Type your message here: "))
-        if query['content'] == "/stop":
+        prompt = make_context("user", input("Type your message here: "))
+        if prompt['content'] == "/stop":
             break
-        messages.append(query)
-        messages = run_cycle(messages)
+        messages.append(prompt)
+        messages = run_cycle.run_cycle(messages)
