@@ -122,6 +122,26 @@ def set_license(license_type: str, years: str, username: str, repo: str) -> str:
 
     return f"Successfully set a(n) {license_type} for {username}'s {repo} repository."
 
+def run_code(language: str, code: str) -> dict[str, bool | int | str] | None:
+    if type(language) != str:
+        raise ValueError("Invalid language specified")
+    if type(code) != str:
+        raise ValueError("Invalid code specified")
+
+    language = language.lower()
+
+    if language not in ['python', 'javascript', 'typescript', 'bash']:
+        raise ValueError("Invalid language specified")
+
+    result = None
+    if language in ['python', 'javascript', 'typescript', 'bash']:
+        response = requests.post("https://agent-gateway-kappa.vercel.app/v1/agent-coderunner/api/execute",
+                                 data={"language":language,"code":code},
+                                 headers={"Content-Type": "application/json"})
+        result = response.json()
+
+    return result
+
 
 tools = [
     {
@@ -184,6 +204,27 @@ tools = [
                     }
                 },
                 "required": ["license_type", "years", "username", "repo"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "run_code",
+            "description": "Run a code and get the result.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "type": "string",
+                        "description": 'The language name. Supported values: "python", "javascript", "typescript", "bash".'
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": 'The copyright year(s) in any of the 2 formats: 1) "2014-2026"; 2) "2026".'
+                    }
+                },
+                "required": ["language", "code"]
             }
         }
     },
@@ -347,6 +388,7 @@ TOOL_MAPPING = {
     "web_search": web_search,
     "get_datetime": get_datetime,
     "set_license": set_license,
+    "run_code": run_code,
     "create_file": create_file,
     "create_repo": create_repo,
     "delete_file": delete_file,
