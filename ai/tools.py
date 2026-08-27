@@ -2,6 +2,7 @@ import json
 import requests
 import sys
 import os
+import judge0
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
@@ -122,25 +123,18 @@ def set_license(license_type: str, years: str, username: str, repo: str) -> str:
 
     return f"Successfully set a(n) {license_type} for {username}'s {repo} repository."
 
-def run_code(language: str, code: str) -> dict[str, bool | int | str] | None:
-    if type(language) != str:
-        raise ValueError("Invalid language specified")
-    if type(code) != str:
-        raise ValueError("Invalid code specified")
+def run_code(language: str, code: str, stdin: str = "") -> dict | None:
+    if not isinstance(language, str) or not isinstance(code, str):
+        raise ValueError("Invalid arguments: language and code must be strings")
 
     language = language.lower()
+    valid_langs = ['python', 'javascript', 'typescript', 'bash']
+    if language not in valid_langs:
+        raise ValueError(f"Invalid language. Supported: {', '.join(valid_langs)}")
 
-    if language not in ['python', 'javascript', 'typescript', 'bash']:
-        raise ValueError("Invalid language specified")
+    result = judge0.run(source_code=code, language=judge0.PYTHON, stdin=stdin) # valid_langs.index(language)
 
-    result = None
-    if language in ['python', 'javascript', 'typescript', 'bash']:
-        response = requests.post("https://agent-gateway-kappa.vercel.app/v1/agent-coderunner/api/execute",
-                                 data={"language":language,"code":code},
-                                 headers={"Content-Type": "application/json"})
-        result = response.json()
-
-    return result
+    return {"status": result.status, "stdout": result.stdout, "stderr": (None if not result.stderr else result.stderr)}
 
 
 tools = [
@@ -222,6 +216,10 @@ tools = [
                     "code": {
                         "type": "string",
                         "description": 'The copyright year(s) in any of the 2 formats: 1) "2014-2026"; 2) "2026".'
+                    },
+                    "stdin": {
+                        "type": "string",
+                        "description": "Input for the code."
                     }
                 },
                 "required": ["language", "code"]
@@ -399,4 +397,5 @@ TOOL_MAPPING = {
 
 
 if __name__ == '__main__':
-    print(get_datetime('MSK'))
+    print(run_code("python", "print('Hello World')"))
+    #print(judge0.PYTHON)
