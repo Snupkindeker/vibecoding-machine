@@ -2,7 +2,7 @@ import json
 import requests
 import sys
 import os
-import judge0
+import base64
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
@@ -128,13 +128,46 @@ def run_code(language: str, code: str, stdin: str = "") -> dict | None:
         raise ValueError("Invalid arguments: language and code must be strings")
 
     language = language.lower()
-    valid_langs = ['python', 'javascript', 'typescript', 'bash']
-    if language not in valid_langs:
-        raise ValueError(f"Invalid language. Supported: {', '.join(valid_langs)}")
+    with open("langs.json", "r", encoding="utf-8") as f:
+        valid_langs: dict = json.load(f)
+    if language not in valid_langs.keys():
+        raise ValueError(f"Invalid language. Supported: {', '.join(valid_langs.keys())}")
 
-    result = judge0.run(source_code=code, language=judge0.PYTHON, stdin=stdin) # valid_langs.index(language)
+    proxy_url = "http://202.28.194.139:31280"
+    proxies = {
+        "http://": proxy_url,
+        "https://": proxy_url,
+    }
 
-    return {"status": result.status, "stdout": result.stdout, "stderr": (None if not result.stderr else result.stderr)}
+    with open("langs.json", "r", encoding="utf-8") as f:
+        language_id = valid_langs[language]
+
+    source_code_b64 = base64.b64encode(code.encode('utf-8')).decode('utf-8')
+    stdin_b64 = base64.b64encode(stdin.encode('utf-8')).decode('utf-8')
+
+    payload = {
+        "language_id": language_id,
+        "source_code": source_code_b64,
+        "stdin": stdin_b64,
+    }
+
+    url = "https://ce.judge0.com/submissions?wait=true&base64_encoded=true"
+    response = requests.post(url, json=payload, proxies=proxies, headers={"Content-Type": "application/json"})
+    stdout, stderr, compile_output = None, None, None
+
+    if response.status_code == 201 or response.status_code == 200:
+        data = response.json()
+        if data.get("stdout"):
+            stdout = base64.b64decode(data["stdout"]).decode('utf-8', errors='replace')
+            # print("STDOUT:", stdout)
+        if data.get("stderr"):
+            stderr = base64.b64decode(data["stderr"]).decode('utf-8', errors='replace')
+            # print("STDERR:", stderr)
+        return {"status": response.status_code, "stdout": stdout, "stderr": (None if not stderr else stderr)}
+    else:
+        return {"error_code": response.status_code, "error_text": response.text}
+
+
 
 
 tools = [
@@ -211,7 +244,7 @@ tools = [
                 "properties": {
                     "language": {
                         "type": "string",
-                        "description": 'The language name. Supported values: "python", "javascript", "typescript", "bash".'
+                        "description": "The language name. Supported values: 'assembly', 'bash', 'basic', 'c++', 'cpp', 'c#', 'csharp', 'c', 'go', 'java', 'js', 'javascript', 'kotlin', 'lua', 'pascal', 'php', 'python', 'ruby', 'rust', 'sql', 'sqlite', 'swift', 'typescript', 'visual_basic'."
                     },
                     "code": {
                         "type": "string",
@@ -397,5 +430,4 @@ TOOL_MAPPING = {
 
 
 if __name__ == '__main__':
-    print(run_code("python", "print('Hello World')"))
-    #print(judge0.PYTHON)
+    print(run_code("python", "print('Hello World)"))
