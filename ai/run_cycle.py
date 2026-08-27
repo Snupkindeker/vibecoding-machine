@@ -39,11 +39,7 @@ def run_cycle(messages: list[dict[str, str]]) -> list[dict[str, str]]:
         tool_result = TOOL_MAPPING[tool_name](**tool_args)
         content = json.dumps(tool_result, ensure_ascii=False)
 
-        return {
-            "role": "tool",
-            "tool_call_id": tool_call.id,
-            "content": content
-        }
+        return make_context("tool", content, tool_call.id)
 
     max_iterations = model_operation_limit
     iteration_count = 0
