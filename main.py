@@ -32,7 +32,7 @@ def main():
     while True:
         try:
             prompt = make_context("user", input(palette.italic + "Type your message here: \n" + palette.blue))
-            if prompt == "":
+            if not prompt['content'].strip():
                 continue
             print(palette.normal, end="")
             if prompt['content'] == "/stop":
