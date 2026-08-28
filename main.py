@@ -21,6 +21,15 @@ from ai.run_cycle import run_cycle
 from ai.make_context import make_context
 from ai.system_context import system_context
 import ai.config as config
+from ai.localization import t, get_translator
+
+# Инициализация переводчика и языка
+translator = get_translator()
+if hasattr(config, 'language'):
+    translator.set_language(config.language)
+else:
+    config.language = 'en'
+    translator.set_language('en')
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
 logger = logging.getLogger(__name__)
@@ -32,194 +41,168 @@ def main():
     while True:
         try:
             prompt = make_context("user", input(palette.italic + "Type your message here: \n" + palette.blue))
-            if prompt['content'].strip() == "" or prompt['content'] == "":
+            if not prompt['content'].strip():
                 continue
             print(palette.normal, end="")
             if prompt['content'] == "/stop":
-                logger.warning(palette.yellow + "Caught /stop. Shutting down..." + palette.normal)
+                logger.warning(palette.yellow + t('stop') + palette.normal)
                 break
             elif prompt['content'] == "/wipe":
                 messages = [system_context()]
-                logger.info(palette.green + "The dialog context was successfully wiped." + palette.normal)
+                logger.info(palette.green + t('wipe_ok') + palette.normal)
             elif prompt['content'].find("/config") == 0:
                 args = prompt['content'].split()
                 if len(args) == 1:
-                    logger.info(palette.green + f"The current model name is set to {config.model_name}." + palette.normal)
-                    logger.info(palette.green + f"The current model operation limit is set to {config.model_operation_limit}." + palette.normal)
-                    logger.info(palette.green + f"The current github username is set to {config.github_username}." + palette.normal)
-                    logger.info(palette.green + f"The current coding case is set to {config.coding_case}." + palette.normal)
-                    logger.info(palette.green + f"The current use markdown is set to {config.use_markdown}." + palette.normal)
-                    logger.info(palette.green + f"The current preferred languages is set to {"any" if len(config.preferred_languages) == 0 else ', '.join(config.preferred_languages)}." + palette.normal)
+                    logger.info(palette.green + t('config_show',
+                          model_name=config.model_name,
+                          model_operation_limit=config.model_operation_limit,
+                          github_username=config.github_username,
+                          coding_case=config.coding_case,
+                          use_markdown=config.use_markdown,
+                          preferred_languages='any' if not config.preferred_languages else ', '.join(config.preferred_languages),
+                          language=config.language) + palette.normal)
                 elif len(args) == 2:
                     match args[1]:
-                        case "model_name":
-                            logger.info(palette.green + f"The current model name is set to {config.model_name}." + palette.normal)
-                        case "model_operation_limit":
-                            logger.info(palette.green + f"The current model operation limit is set to {config.model_operation_limit}." + palette.normal)
-                        case "github_username":
-                            logger.info(palette.green + f"The current github username is set to {config.github_username}." + palette.normal)
-                        case "coding_case":
-                            logger.info(palette.green + f"The current coding case is set to {config.coding_case}." + palette.normal)
-                        case "use_markdown":
-                            logger.info(palette.green + f"The current use markdown is set to {config.use_markdown}." + palette.normal)
-                        case "preferred_languages":
-                            logger.info(palette.green + f"The current preferred languages is set to {"any" if len(config.preferred_languages) == 0 else ', '.join(config.preferred_languages)}." + palette.normal)
                         case "check":
                             try:
                                 config.check_config()
-                                logger.info(palette.green + "Config checked successfully." + palette.normal)
-                            except config.ConfigError as error:
-                                logger.error(palette.red + f"An error occurred while checking config: {error}" + palette.normal)
+                                logger.info(palette.green + t('config_check_ok') + palette.normal)
+                            except config.ConfigError as e:
+                                logger.error(palette.red + t('config_check_error', error=str(e)) + palette.normal)
                         case "reset":
                             config.set_default_config()
-                            logger.info(palette.green + "Config reset successfully." + palette.normal)
+                            translator.set_language(config.language)
+                            logger.info(palette.green + t('config_reset_ok') + palette.normal)
                         case _:
-                            logger.error(palette.red + "The command argument is invalid. Use /help for more information." + palette.normal)
+                            logger.error(palette.red + t('config_invalid') + palette.normal)
                 elif len(args) == 3:
-                    match args[1]:
-                        case "model_name":
-                            if type(args[2]) != str:
-                                raise ValueError("model_name must be a string.")
-                            config.model_name = args[2]
-                            logger.info(palette.green + f"Model name successfully set to {config.model_name}." + palette.normal)
-                        case "model_operation_limit":
-                            if type(args[2]) != str:
-                                raise ValueError("model_operation_limit must be an integer.")
-                            try:
-                                config.model_operation_limit = int(args[2])
-                                logger.info(palette.green + f"Model operation limit successfully set to {config.model_operation_limit}." + palette.normal)
-                            except ValueError:
-                                raise ValueError("model_operation_limit must be an integer.")
-                        case "github_username":
-                            if type(args[2]) != str:
-                                raise ValueError("github_username must be a string.")
-                            config.github_username = args[2]
-                            logger.info(palette.green + f"Github username successfully set to {config.github_username}." + palette.normal)
-                        case "coding_case":
-                            if type(args[2]) != str:
-                                raise ValueError("coding_case must be a string.")
-                            if args[2] not in ['snake', 'camel', 'pascal']:
-                                raise ValueError("Invalid coding case.")
-                            config.coding_case = args[2]
-                            logger.info(palette.green + f"Coding case successfully set to {config.coding_case}." + palette.normal)
-                        case "use_markdown":
-                            if type(args[2]) != str:
-                                raise ValueError("use_markdown must be true or false.")
-                            if args[2].lower() not in ['true', 'false']:
-                                raise ValueError("use_markdown must be true or false.")
-                            config.use_markdown = (True if args[2].lower() == 'true' else False)
-                            logger.info(palette.green + f"Use markdown successfully set to {config.use_markdown}." + palette.normal)
-                        case "preferred_languages":
-                            if type(args[2]) != str:
-                                raise ValueError("preferred_languages must be words separated by commas." + palette.normal)
-                            langs = [lang.strip() for lang in args[2].split(',')]
-                            if langs == ['any']:
-                                config.preferred_languages = []
-                                logger.info(palette.green + f"Preferred languages successfully set to any." + palette.normal)
+                    key, value = args[1], args[2]
+                    if key == "language":
+                        if value in ['en', 'ru']:
+                            config.language = value
+                            translator.set_language(value)
+                            logger.info(palette.green + t('config_language_changed', lang=value) + palette.normal)
+                        else:
+                            logger.error(palette.red + t('config_set_error', key='language', type='en/ru') + palette.normal)
+                    elif key == "model_name":
+                        config.model_name = value
+                        logger.info(palette.green + t('config_set_ok', key='model_name', value=value) + palette.normal)
+                    elif key == "model_operation_limit":
+                        try:
+                            config.model_operation_limit = int(value)
+                            logger.info(palette.green + t('config_set_ok', key='model_operation_limit', value=value) + palette.normal)
+                        except ValueError:
+                            logger.error(palette.red + t('config_set_error', key='model_operation_limit', type='integer') + palette.normal)
+                    elif key == "github_username":
+                        config.github_username = value
+                        logger.info(palette.green + t('config_set_ok', key='github_username', value=value) + palette.normal)
+                    elif key == "coding_case":
+                        if value in ['snake', 'camel', 'pascal']:
+                            config.coding_case = value
+                            logger.info(palette.green + t('config_set_ok', key='coding_case', value=value) + palette.normal)
+                        else:
+                            logger.error(palette.red + t('config_set_error', key='coding_case', type='snake/camel/pascal') + palette.normal)
+                    elif key == "use_markdown":
+                        if value.lower() in ['true', 'false']:
+                            config.use_markdown = value.lower() == 'true'
+                            logger.info(palette.green + t('config_set_ok', key='use_markdown', value=str(config.use_markdown)) + palette.normal)
+                        else:
+                            logger.error(palette.red + t('config_set_error', key='use_markdown', type='true/false') + palette.normal)
+                    elif key == "preferred_languages":
+                        if value == "any":
+                            config.preferred_languages = []
+                            logger.info(palette.green + t('config_set_ok', key='preferred_languages', value='any') + palette.normal)
+                        else:
+                            langs = [lang.strip() for lang in value.split(',')]
+                            valid_langs = ['assembly', 'bash', 'basic', 'c++', 'cpp', 'c#', 'csharp', 'c', 'go',
+                                           'java', 'js', 'javascript', 'kotlin', 'lua', 'pascal', 'php', 'python',
+                                           'ruby', 'rust', 'sql', 'sqlite', 'swift', 'typescript', 'visual_basic']
+                            invalid = [l for l in langs if l not in valid_langs]
+                            if invalid:
+                                logger.error(palette.red + t('config_set_error', key='preferred_languages', type='valid language codes') + palette.normal)
                             else:
-                                valid_langs = ['assembly', 'bash', 'basic', 'c++', 'cpp', 'c#', 'csharp', 'c', 'go',
-                                               'java', 'js', 'javascript', 'kotlin', 'lua', 'pascal', 'php', 'python',
-                                               'ruby', 'rust', 'sql', 'sqlite', 'swift', 'typescript', 'visual_basic']
-                                for lang in langs:
-                                    if lang not in valid_langs:
-                                        raise ValueError("Invalid preferred languages.")
                                 config.preferred_languages = langs
-                                logger.info(palette.green + f"Preferred languages successfully set to {', '.join(config.preferred_languages)}." + palette.normal)
-                        case "check":
-                            try:
-                                config.check_config()
-                                logger.info(palette.green + "Config checked successfully." + palette.normal)
-                            except config.ConfigError as error:
-                                logger.error(palette.red + f"An error occurred while checking config: {error}" + palette.normal)
-                        case "reset":
-                            config.set_default_config()
-                            logger.info(palette.green + "Config reset successfully. No errors found." + palette.normal)
-                        case _:
-                            logger.error(palette.red + "The command argument is invalid. Use /help for more information." + palette.normal)
+                                logger.info(palette.green + t('config_set_ok', key='preferred_languages', value=', '.join(langs)) + palette.normal)
+                    else:
+                        logger.error(palette.red + t('config_unknown', key=key) + palette.normal)
                 else:
-                    raise ValueError("Too many arguments.")
+                    logger.error(palette.red + t('config_invalid') + palette.normal)
 
             elif prompt['content'] == "/help":
-                print(palette.purple + "/help - view this menu.")
-                print("/config <var/check/reset> [value] - get a config value, set it to a new value, check the config or reset it to default.")
-                print("/wipe - wipe the dialog context.")
-                print("/stop (or CTRL + C) - stop the program.")
-                print("/save <filename> - save the current dialog to a file.")
-                print("/load <filename> - load the current dialog from a file.")
-                print("/del <filename> - delete a dialog file." + palette.normal)
+                print(palette.purple + t('command_help') + palette.normal)
 
             elif prompt['content'].find("/save") == 0:
                 args = prompt['content'].split()
                 if len(args) != 2:
-                    raise ValueError("Invalid number of arguments. Usage: /save <file_name_without_extension>")
-                file_name = args[1].strip() + ".json"
-                dialog_path = os.path.join(ai_dir, 'dialogs', file_name)
+                    logger.error(palette.red + t('save_usage') + palette.normal)
+                    continue
+                filename = args[1].strip() + ".json"
+                filepath = os.path.join(dialogs_dir, filename)
                 try:
-                    with open(dialog_path, "x", encoding='utf-8') as f:
+                    with open(filepath, "x", encoding='utf-8') as f:
                         pass
-                    with open(dialog_path, "w", encoding='utf-8') as f:
+                    with open(filepath, "w", encoding='utf-8') as f:
                         json.dump(messages, f, ensure_ascii=False, indent=4)
-                    logger.info(palette.green + f"Successfully saved current dialog to {dialog_path}." + palette.normal)
+                    logger.info(palette.green + t('save_ok', filename=filename) + palette.normal)
                 except FileExistsError:
-                    logger.error(palette.red + "The file already exists. Please choose another file name.")
+                    logger.error(palette.red + t('save_exists', filename=filename) + palette.normal)
 
             elif prompt['content'].find("/load") == 0:
                 args = prompt['content'].split()
                 if len(args) != 2:
-                    raise ValueError("Invalid number of arguments. Usage: /load <file_name_without_extension>")
-                file_name = args[1].strip() + ".json"
-                dialog_path = os.path.join(ai_dir, 'dialogs', file_name)
+                    logger.error(palette.red + t('load_usage') + palette.normal)
+                    continue
+                filename = args[1].strip() + ".json"
+                filepath = os.path.join(dialogs_dir, filename)
                 try:
-                    with open(dialog_path, "r", encoding='utf-8') as f:
+                    with open(filepath, "r", encoding='utf-8') as f:
                         loaded = json.load(f)
                     if isinstance(loaded, list) and all(isinstance(m, dict) for m in loaded):
                         messages = loaded
+                        logger.info(palette.green + t('load_ok', filename=filename) + palette.normal)
                     else:
-                        raise ValueError("Invalid dialog format")
-                    logger.info(palette.green + f"Successfully loaded the dialog from {dialog_path}." + palette.normal)
+                        raise ValueError(t('load_invalid'))
                 except FileNotFoundError:
-                    logger.error(palette.red + "The file doesn't exist. Please choose another file name.")
+                    logger.error(palette.red + t('load_not_found', filename=filename) + palette.normal)
+                except Exception as e:
+                    logger.error(palette.red + t('load_error', error=str(e)) + palette.normal)
 
             elif prompt['content'].find("/del") == 0:
                 args = prompt['content'].split()
                 if len(args) != 2:
-                    raise ValueError("Invalid number of arguments. Usage: /load <file_name_without_extension>")
-                file_name = args[1].strip() + ".json"
-                dialog_path = os.path.join(ai_dir, 'dialogs', file_name)
+                    logger.error(palette.red + t('del_usage') + palette.normal)
+                    continue
+                filename = args[1].strip() + ".json"
+                filepath = os.path.join(dialogs_dir, filename)
                 try:
-                    os.remove(dialog_path)
-                    logger.info(palette.green + f"Successfully deleted the saved dialog from {dialog_path}." + palette.normal)
+                    os.remove(filepath)
+                    logger.info(palette.green + t('del_ok', filename=filename) + palette.normal)
                 except FileNotFoundError:
-                    logger.error(palette.red + "The file doesn't exist. Please choose another file name.")
-                except PermissionError:
-                    logger.error(palette.red + "Permission denied. Please choose another file name.")
-                except IsADirectoryError:
-                    logger.error(palette.red + "The file doesn't exist. Please choose another file name.")
+                    logger.error(palette.red + t('del_not_found', filename=filename) + palette.normal)
+                except Exception as e:
+                    logger.error(palette.red + t('del_error', error=str(e)) + palette.normal)
 
             else:
-                # Обычное сообщение — отправляем модели через генератор
                 messages.append(prompt)
-                print(palette.italic + "🧠 Thinking..." + palette.normal)
+                print(palette.italic + t('terminal_thinking') + palette.normal)
                 for event in run_cycle(messages):
                     if event['type'] == 'llm_call':
-                        # Можно вывести в debug, но оставим заглушку
                         pass
                     elif event['type'] == 'tool_call':
                         args_str = json.dumps(event['data']['arguments'], ensure_ascii=False)
-                        print(palette.yellow + f"🔧 Calling tool `{event['data']['name']}` with {args_str}" + palette.normal)
+                        print(palette.yellow + t('terminal_tool_call', name=event['data']['name'], args=args_str) + palette.normal)
                     elif event['type'] == 'tool_result':
                         result_preview = json.dumps(event['data']['result'], ensure_ascii=False)[:200]
-                        print(palette.green + f"✅ Tool `{event['data']['name']}` returned: {result_preview}..." + palette.normal)
+                        print(palette.green + t('terminal_tool_result', name=event['data']['name'], result=result_preview) + palette.normal)
                     elif event['type'] == 'final_answer':
-                        print(palette.white + "💬 Final answer:" + palette.normal)
+                        print(palette.white + t('terminal_final_answer') + palette.normal)
                         print(palette.white + event['data']['content'] + palette.normal)
                     elif event['type'] == 'warning':
-                        print(palette.red + f"⚠️ Warning: {event['data']['message']}" + palette.normal)
-                # После окончания генератора messages уже обновлён, переходим к следующему вводу
+                        print(palette.red + t('terminal_warning', message=event['data']['message']) + palette.normal)
 
         except KeyboardInterrupt:
-            logger.warning(palette.yellow + "Caught CTRL + C. Shutting down..." + palette.normal)
-            exit()
+            logger.warning(palette.yellow + t('ctrl_c') + palette.normal)
+            break
         except Exception as e:
             logger.error(palette.red + str(e) + palette.normal)
 
