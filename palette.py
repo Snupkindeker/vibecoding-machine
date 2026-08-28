@@ -1,5 +1,9 @@
 class Palette:
     def __init__(self):
+
+        # Normal text (0)
+        self.normal = '\033[0;00m'
+
         # Text styles (1, 3, 4, 7, 9, 21)
         self.bold = '\033[0;01m'
         self.italic = '\033[0;03m'
