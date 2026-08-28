@@ -107,7 +107,7 @@ def set_license(license_type: str, years: str, username: str, repo: str, descrip
 
     license_type = license_type.lower()
 
-    if license_type.lower() not in ['mit_license', 'apache_license_2.0', 'gnu_gpl_v3']:
+    if license_type.lower() not in ['mit_license', 'apache_license_2.0', 'gnu_gpl_v3', 'mpl_2.0']:
         raise ValueError("Invalid license type specified")
     if license_type.lower() in ['gnu_gpl_v3'] and description is None:
         raise ValueError("Description not specified")
@@ -217,7 +217,7 @@ tools = [
                 "properties": {
                     "license_type": {
                         "type": "string",
-                        "description": 'The license type. Supported license types: "mit_license", "apache_license_2.0", "gpu_gpl_v3"'
+                        "description": 'The license type. Supported license types: "mit_license", "apache_license_2.0", "gpu_gpl_v3", "mpl_2.0"'
                     },
                     "years": {
                         "type": "string",
