@@ -122,6 +122,12 @@ def main():
                         print("The command argument is invalid. Use /help for more information.")
             else:
                 raise ValueError("Too many arguments.")
+
+        elif prompt['content'] == "/help":
+            print("/help - view this menu.")
+            print("/config <{>var/check/reset> [value] - get a config value, set it to a new value, check the config or reset it to default.")
+            print("/wipe - wipe the dialog context.")
+            print("/stop - stop the dialog.")
         else:
             messages.append(prompt)
             messages = run_cycle(messages)
