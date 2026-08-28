@@ -86,7 +86,7 @@ def get_datetime(timezone: str) -> str | None:
 
     return data
 
-def set_license(license_type: str, years: str, username: str, repo: str) -> str:
+def set_license(license_type: str, years: str, username: str, repo: str, description: str | None = None) -> str:
     if '-' in years:
         year1 = years.split('-')[0].isdigit()
         year2 = years.split('-')[1].isdigit()
@@ -107,11 +107,13 @@ def set_license(license_type: str, years: str, username: str, repo: str) -> str:
 
     license_type = license_type.lower()
 
-    if license_type.lower() not in ['mit_license', 'apache_license_2.0']:
+    if license_type.lower() not in ['mit_license', 'apache_license_2.0', 'gnu_gpl_v3']:
         raise ValueError("Invalid license type specified")
+    if license_type.lower() in ['gnu_gpl_v3'] and description is None:
+        raise ValueError("Description not specified")
 
     with open(f"{licenses_path}/{license_type}.txt", 'r') as f:
-        text = f.read().replace("{YEAR}", years).replace("{USERNAME}", username)
+        text = f.read().replace("{YEARS}", years).replace("{USERNAME}", username).replace("{NAME}", repo).replace("{DESCRIPTION}", str(description))
     file_list = get_file_list(repo, '.')['files']
     if "LICENSE.md" in file_list:
         delete_file(repo, "LICENSE.md")
@@ -215,7 +217,7 @@ tools = [
                 "properties": {
                     "license_type": {
                         "type": "string",
-                        "description": 'The license type. Supported license types: "mit_license", "apache_license_2.0"'
+                        "description": 'The license type. Supported license types: "mit_license", "apache_license_2.0", "gpu_gpl_v3"'
                     },
                     "years": {
                         "type": "string",
@@ -228,6 +230,10 @@ tools = [
                     "repo": {
                         "type": "string",
                         "description": 'The github repository name in User/Repo_name format (for example "Flowseal/zapret-discord-youtube").'
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": 'A one-line description of the repo. Only required for "gnu_gpl_v3" license.'
                     }
                 },
                 "required": ["license_type", "years", "username", "repo"]
