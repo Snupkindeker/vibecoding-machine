@@ -3,7 +3,7 @@ import os
 import logging
 import json
 
-ai_dir = os.path.dirname(os.path.abspath(__file__)) + '\\ai'
+ai_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ai')
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
 
@@ -32,6 +32,8 @@ def main():
     while True:
         try:
             prompt = make_context("user", input(palette.italic + "Type your message here: \n" + palette.blue))
+            if prompt == "":
+                continue
             print(palette.normal, end="")
             if prompt['content'] == "/stop":
                 logger.warning(palette.yellow + "Caught /stop. Shutting down..." + palette.normal)
@@ -81,7 +83,9 @@ def main():
                             config.model_name = args[2]
                             logger.info(palette.green + f"Model name successfully set to {config.model_name}." + palette.normal)
                         case "model_operation_limit":
-                            if type(args[2]) != int:
+                            if type(args[2]) != str:
+                                raise ValueError("model_operation_limit must be an integer.")
+                            if not args[2].isdigit():
                                 raise ValueError("model_operation_limit must be an integer.")
                             config.model_operation_limit = args[2]
                             logger.info(palette.green + f"Model operation limit successfully set to {config.model_operation_limit}." + palette.normal)
