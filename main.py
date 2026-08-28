@@ -40,7 +40,7 @@ def main():
 
     while True:
         try:
-            prompt = make_context("user", input(palette.italic + "Type your message here: \n" + palette.blue))
+            prompt = make_context("user", input(palette.italic + t("prompt_field") + " \n" + palette.blue))
             if not prompt['content'].strip():
                 continue
             print(palette.normal, end="")
@@ -78,12 +78,12 @@ def main():
                 elif len(args) == 3:
                     key, value = args[1], args[2]
                     if key == "language":
-                        if value in ['en', 'ru']:
+                        if value in ['en', 'ru', 'es', 'fr', 'zh', 'ar', 'de', 'ko', 'pt', 'ja', 'hi', 'bn', 'it']:
                             config.language = value
                             translator.set_language(value)
                             logger.info(palette.green + t('config_language_changed', lang=value) + palette.normal)
                         else:
-                            logger.error(palette.red + t('config_set_error', key='language', type='en/ru') + palette.normal)
+                            logger.error(palette.red + t('config_set_error', key='language', type='en/ru/es/fr/zh/zr/de/ko/pt/ja/hi/bn/it') + palette.normal)
                     elif key == "model_name":
                         config.model_name = value
                         logger.info(palette.green + t('config_set_ok', key='model_name', value=value) + palette.normal)
