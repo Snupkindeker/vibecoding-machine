@@ -16,13 +16,11 @@ if current_dir not in sys.path:
 if root_dir not in sys.path:
     sys.path.append(root_dir)
 
-
 from palette import Palette
 from ai.run_cycle import run_cycle
 from ai.make_context import make_context
 from ai.system_context import system_context
 import ai.config as config
-
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
 logger = logging.getLogger(__name__)
@@ -34,7 +32,7 @@ def main():
     while True:
         try:
             prompt = make_context("user", input(palette.italic + "Type your message here: \n" + palette.blue))
-            if prompt['content'].strip() == "" or prompt['content']== "":
+            if prompt['content'].strip() == "" or prompt['content'] == "":
                 continue
             print(palette.normal, end="")
             if prompt['content'] == "/stop":
@@ -89,8 +87,7 @@ def main():
                                 raise ValueError("model_operation_limit must be an integer.")
                             try:
                                 config.model_operation_limit = int(args[2])
-                                logger.info(
-                                    palette.green + f"Model operation limit successfully set to {config.model_operation_limit}." + palette.normal)
+                                logger.info(palette.green + f"Model operation limit successfully set to {config.model_operation_limit}." + palette.normal)
                             except ValueError:
                                 raise ValueError("model_operation_limit must be an integer.")
                         case "github_username":
@@ -115,17 +112,18 @@ def main():
                         case "preferred_languages":
                             if type(args[2]) != str:
                                 raise ValueError("preferred_languages must be words separated by commas." + palette.normal)
-                            args[2] = list(args[2].split(','))
-                            if args[2] == ['any']:
+                            langs = [lang.strip() for lang in args[2].split(',')]
+                            if langs == ['any']:
                                 config.preferred_languages = []
                                 logger.info(palette.green + f"Preferred languages successfully set to any." + palette.normal)
                             else:
-                                for lang in args[2]:
-                                    if lang not in ['assembly', 'bash', 'basic', 'c++', 'cpp', 'c#', 'csharp', 'c', 'go',
-                                                        'java', 'js', 'javascript', 'kotlin', 'lua', 'pascal', 'php', 'python',
-                                                        'ruby', 'rust', 'sql', 'sqlite', 'swift', 'typescript', 'visual_basic']:
+                                valid_langs = ['assembly', 'bash', 'basic', 'c++', 'cpp', 'c#', 'csharp', 'c', 'go',
+                                               'java', 'js', 'javascript', 'kotlin', 'lua', 'pascal', 'php', 'python',
+                                               'ruby', 'rust', 'sql', 'sqlite', 'swift', 'typescript', 'visual_basic']
+                                for lang in langs:
+                                    if lang not in valid_langs:
                                         raise ValueError("Invalid preferred languages.")
-                                config.preferred_languages = args[2]
+                                config.preferred_languages = langs
                                 logger.info(palette.green + f"Preferred languages successfully set to {', '.join(config.preferred_languages)}." + palette.normal)
                         case "check":
                             try:
@@ -154,15 +152,13 @@ def main():
                 args = prompt['content'].split()
                 if len(args) != 2:
                     raise ValueError("Invalid number of arguments. Usage: /save <file_name_without_extension>")
-
                 file_name = args[1].strip() + ".json"
                 dialog_path = os.path.join(ai_dir, 'dialogs', file_name)
                 try:
-                    with open(dialog_path, "x", encoding='utf-8') as file:
-                        file.close()
-                    with open(dialog_path, "w", encoding='utf-8') as file:
-                        json.dump(messages, file, ensure_ascii=False, indent=4)
-
+                    with open(dialog_path, "x", encoding='utf-8') as f:
+                        pass
+                    with open(dialog_path, "w", encoding='utf-8') as f:
+                        json.dump(messages, f, ensure_ascii=False, indent=4)
                     logger.info(palette.green + f"Successfully saved current dialog to {dialog_path}." + palette.normal)
                 except FileExistsError:
                     logger.error(palette.red + "The file already exists. Please choose another file name.")
@@ -171,50 +167,61 @@ def main():
                 args = prompt['content'].split()
                 if len(args) != 2:
                     raise ValueError("Invalid number of arguments. Usage: /load <file_name_without_extension>")
-
                 file_name = args[1].strip() + ".json"
                 dialog_path = os.path.join(ai_dir, 'dialogs', file_name)
-
                 try:
-                    with open(dialog_path, "r", encoding='utf-8') as file:
-                        loaded = json.load(file)
+                    with open(dialog_path, "r", encoding='utf-8') as f:
+                        loaded = json.load(f)
                     if isinstance(loaded, list) and all(isinstance(m, dict) for m in loaded):
                         messages = loaded
                     else:
                         raise ValueError("Invalid dialog format")
-
                     logger.info(palette.green + f"Successfully loaded the dialog from {dialog_path}." + palette.normal)
                 except FileNotFoundError:
-                    logger.error(palette.red + "The file doesn't exist. Please choose another file name." + palette.normal)
+                    logger.error(palette.red + "The file doesn't exist. Please choose another file name.")
 
             elif prompt['content'].find("/del") == 0:
                 args = prompt['content'].split()
                 if len(args) != 2:
                     raise ValueError("Invalid number of arguments. Usage: /load <file_name_without_extension>")
-
                 file_name = args[1].strip() + ".json"
                 dialog_path = os.path.join(ai_dir, 'dialogs', file_name)
                 try:
                     os.remove(dialog_path)
-
                     logger.info(palette.green + f"Successfully deleted the saved dialog from {dialog_path}." + palette.normal)
                 except FileNotFoundError:
-                    logger.error(palette.red + "The file doesn't exist. Please choose another file name." + palette.normal)
+                    logger.error(palette.red + "The file doesn't exist. Please choose another file name.")
                 except PermissionError:
-                    logger.error(palette.red + "Permission denied. Please choose another file name." + palette.normal)
+                    logger.error(palette.red + "Permission denied. Please choose another file name.")
                 except IsADirectoryError:
-                    logger.error(palette.red + "The file doesn't exist. Please choose another file name." + palette.normal)
+                    logger.error(palette.red + "The file doesn't exist. Please choose another file name.")
 
             else:
+                # Обычное сообщение — отправляем модели через генератор
                 messages.append(prompt)
-                messages = run_cycle(messages)
+                print(palette.italic + "🧠 Thinking..." + palette.normal)
+                for event in run_cycle(messages):
+                    if event['type'] == 'llm_call':
+                        # Можно вывести в debug, но оставим заглушку
+                        pass
+                    elif event['type'] == 'tool_call':
+                        args_str = json.dumps(event['data']['arguments'], ensure_ascii=False)
+                        print(palette.yellow + f"🔧 Calling tool `{event['data']['name']}` with {args_str}" + palette.normal)
+                    elif event['type'] == 'tool_result':
+                        result_preview = json.dumps(event['data']['result'], ensure_ascii=False)[:200]
+                        print(palette.green + f"✅ Tool `{event['data']['name']}` returned: {result_preview}..." + palette.normal)
+                    elif event['type'] == 'final_answer':
+                        print(palette.white + "💬 Final answer:" + palette.normal)
+                        print(palette.white + event['data']['content'] + palette.normal)
+                    elif event['type'] == 'warning':
+                        print(palette.red + f"⚠️ Warning: {event['data']['message']}" + palette.normal)
+                # После окончания генератора messages уже обновлён, переходим к следующему вводу
 
         except KeyboardInterrupt:
             logger.warning(palette.yellow + "Caught CTRL + C. Shutting down..." + palette.normal)
             exit()
         except Exception as e:
             logger.error(palette.red + str(e) + palette.normal)
-
 
 if __name__ == '__main__':
     main()
