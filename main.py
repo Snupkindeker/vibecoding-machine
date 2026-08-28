@@ -172,9 +172,14 @@ def main():
 
                 file_name = args[1].strip() + ".json"
                 dialog_path = os.path.join(ai_dir, 'dialogs', file_name)
+
                 try:
                     with open(dialog_path, "r", encoding='utf-8') as file:
-                        messages = json.load(file)
+                        loaded = json.load(file)
+                    if isinstance(loaded, list) and all(isinstance(m, dict) for m in loaded):
+                        messages = loaded
+                    else:
+                        raise ValueError("Invalid dialog format")
 
                     logger.info(palette.green + f"Successfully loaded the dialog from {dialog_path}." + palette.normal)
                 except FileNotFoundError:
@@ -190,7 +195,7 @@ def main():
                 try:
                     os.remove(dialog_path)
 
-                    logger.error(palette.red + f"Successfully deleted the saved dialog from {dialog_path}." + palette.normal)
+                    logger.info(palette.red + f"Successfully deleted the saved dialog from {dialog_path}." + palette.normal)
                 except FileNotFoundError:
                     logger.error(palette.red + "The file doesn't exist. Please choose another file name." + palette.normal)
                 except PermissionError:
