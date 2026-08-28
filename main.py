@@ -15,6 +15,7 @@ if root_dir not in sys.path:
     sys.path.append(root_dir)
 
 
+from palette import Palette
 from ai.run_cycle import run_cycle
 from ai.make_context import make_context
 from ai.system_context import system_context
@@ -23,13 +24,14 @@ import ai.config as config
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
 logger = logging.getLogger(__name__)
+palette = Palette()
 
 def main():
     messages = [system_context()]
 
     while True:
         try:
-            prompt = make_context("user", input("Type your message here: "))
+            prompt = make_context("user", input(palette.italic + "Type your message here: \n"))
             if prompt['content'] == "/stop":
                 break
             elif prompt['content'] == "/wipe":
