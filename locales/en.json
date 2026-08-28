@@ -15,6 +15,7 @@
     "sidebar_select_file": "Select file",
     "sidebar_no_files": "No saved dialogs",
     "sidebar_commands_hint": "💡 Commands: /help, /wipe, /config, /save, /load, /del",
+    "sidebar_language": "Language",
     "chat_user": "You",
     "chat_assistant": "AI",
     "chat_tool_call": "Tool call",
