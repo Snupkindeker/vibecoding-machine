@@ -154,13 +154,14 @@ def main():
                     raise ValueError("Invalid number of arguments. Usage: /save <file_name_without_extension>")
 
                 file_name = args[1].strip() + ".json"
+                dialog_path = os.path.join(ai_dir, 'dialogs', file_name)
                 try:
-                    with open(ai_dir + '\\dialogs\\' + file_name, "x", encoding='utf-8') as file:
+                    with open(dialog_path, "x", encoding='utf-8') as file:
                         file.close()
-                    with open(ai_dir + '\\dialogs\\' + file_name, "w", encoding='utf-8') as file:
+                    with open(dialog_path, "w", encoding='utf-8') as file:
                         json.dump(messages, file, ensure_ascii=False, indent=4)
 
-                    logger.info(palette.green + f"Successfully saved current dialog to {ai_dir + '\\dialogs\\' + file_name}." + palette.normal)
+                    logger.info(palette.green + f"Successfully saved current dialog to {dialog_path}." + palette.normal)
                 except FileExistsError:
                     logger.error(palette.red + "The file already exists. Please choose another file name.")
 
@@ -170,11 +171,12 @@ def main():
                     raise ValueError("Invalid number of arguments. Usage: /load <file_name_without_extension>")
 
                 file_name = args[1].strip() + ".json"
+                dialog_path = os.path.join(ai_dir, 'dialogs', file_name)
                 try:
-                    with open(ai_dir + '\\dialogs\\' + file_name, "r", encoding='utf-8') as file:
+                    with open(dialog_path, "r", encoding='utf-8') as file:
                         messages = json.load(file)
 
-                    logger.info(palette.green + f"Successfully loaded the dialog from {ai_dir + '\\dialogs\\' + file_name}." + palette.normal)
+                    logger.info(palette.green + f"Successfully loaded the dialog from {dialog_path}." + palette.normal)
                 except FileNotFoundError:
                     logger.error(palette.red + "The file doesn't exist. Please choose another file name." + palette.normal)
 
@@ -184,10 +186,11 @@ def main():
                     raise ValueError("Invalid number of arguments. Usage: /load <file_name_without_extension>")
 
                 file_name = args[1].strip() + ".json"
+                dialog_path = os.path.join(ai_dir, 'dialogs', file_name)
                 try:
-                    os.remove(ai_dir + '\\dialogs\\' + file_name)
+                    os.remove(dialog_path)
 
-                    logger.error(palette.red + f"Successfully deleted the saved dialog from {ai_dir + '\\dialogs\\' + file_name}." + palette.normal)
+                    logger.error(palette.red + f"Successfully deleted the saved dialog from {dialog_path}." + palette.normal)
                 except FileNotFoundError:
                     logger.error(palette.red + "The file doesn't exist. Please choose another file name." + palette.normal)
                 except PermissionError:
