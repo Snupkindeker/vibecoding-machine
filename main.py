@@ -134,10 +134,10 @@ def main():
                     raise ValueError("Too many arguments.")
 
             elif prompt['content'] == "/help":
-                print("/help - view this menu.")
+                print(palette.purple + "/help - view this menu.")
                 print("/config <var/check/reset> [value] - get a config value, set it to a new value, check the config or reset it to default.")
                 print("/wipe - wipe the dialog context.")
-                print("/stop - stop the program.")
+                print("/stop - stop the program." + palette.normal)
 
             elif prompt['content'].find("/save") == 0:
                 args = prompt['content'].split()
