@@ -59,5 +59,10 @@
     "terminal_warning": "⚠️ Warning: {message}",
     "terminal_tool_call": "🔧 Calling tool `{name}` with {args}",
     "terminal_tool_result": "✅ Tool `{name}` returned: {result}...",
-    "prompt_field": "Type your message or command..."
+    "prompt_field": "Type your message or command...",
+    "save_as_title": "💾 Save dialog",
+    "save_as_placeholder": "filename (no extension)",
+    "save_as_button": "💾 Save as",
+    "save_timestamp_button": "⏱️ Save with timestamp",
+    "save_name_required": "Enter a filename"
 }
