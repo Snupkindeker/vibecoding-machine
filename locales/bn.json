@@ -36,7 +36,7 @@
     "config_set_error": "❌ {key} অবশ্যই {type} হতে হবে",
     "config_invalid": "❌ অবৈধ বিন্যাস। ব্যবহার করুন: `/config`, `/config check`, `/config reset` অথবা `/config <প্যারামিটার> <মান>`",
     "config_unknown": "❌ অজানা প্যারামিটার: `{key}`",
-    "config_language_changed": "ভাষা `{lang}` এ পরিবর্তন করা হয়েছে। দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন।",
+    "config_language_changed": "ভাষা `{lang}` এ পরিবর্তন করা হয়েছে।",
     "save_usage": "❌ ব্যবহার: `/save <এক্সটেনশন_ছাড়া_ফাইলের_নাম>`",
     "save_exists": "❌ ফাইল `{filename}` ইতিমধ্যে বিদ্যমান। অন্য নাম চয়ন করুন।",
     "save_ok": "✅ সংলাপ `{filename}` এ সংরক্ষিত হয়েছে",

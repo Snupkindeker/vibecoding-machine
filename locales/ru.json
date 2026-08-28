@@ -36,7 +36,7 @@
     "config_set_error": "❌ {key} должно быть {type}",
     "config_invalid": "❌ Неверный формат. Используйте: `/config`, `/config check`, `/config reset` или `/config <параметр> <значение>`",
     "config_unknown": "❌ Неизвестный параметр: `{key}`",
-    "config_language_changed": "Язык изменён на `{lang}`. Пожалуйста, обновите страницу.",
+    "config_language_changed": "Язык изменён на `{lang}`.",
     "save_usage": "❌ Использование: `/save <имя_файла_без_расширения>`",
     "save_exists": "❌ Файл `{filename}` уже существует. Выберите другое имя.",
     "save_ok": "✅ Диалог сохранён в `{filename}`",

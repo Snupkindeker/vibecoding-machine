@@ -36,7 +36,7 @@
     "config_set_error": "❌ {key} {type} होना चाहिए",
     "config_invalid": "❌ अमान्य प्रारूप। उपयोग करें: `/config`, `/config check`, `/config reset` या `/config <पैरामीटर> <मान>`",
     "config_unknown": "❌ अज्ञात पैरामीटर: `{key}`",
-    "config_language_changed": "भाषा `{lang}` में बदल दी गई। कृपया पृष्ठ को ताज़ा करें।",
+    "config_language_changed": "भाषा `{lang}` में बदल दी गई।",
     "save_usage": "❌ उपयोग: `/save <बिना_एक्सटेंशन_के_फ़ाइलनाम>`",
     "save_exists": "❌ फ़ाइल `{filename}` पहले से मौजूद है। दूसरा नाम चुनें।",
     "save_ok": "✅ संवाद `{filename}` में सहेजा गया",

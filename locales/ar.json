@@ -36,7 +36,7 @@
     "config_set_error": "❌ يجب أن يكون {key} من نوع {type}",
     "config_invalid": "❌ تنسيق غير صالح. استخدم: `/config`، `/config check`، `/config reset` أو `/config <معامل> <قيمة>`",
     "config_unknown": "❌ معامل غير معروف: `{key}`",
-    "config_language_changed": "تم تغيير اللغة إلى `{lang}`. يرجى تحديث الصفحة لتطبيق التغيير.",
+    "config_language_changed": "تم تغيير اللغة إلى `{lang}`.",
     "save_usage": "❌ الاستخدام: `/save <اسم_ملف_بدون_امتداد>`",
     "save_exists": "❌ الملف `{filename}` موجود بالفعل. اختر اسمًا آخر.",
     "save_ok": "✅ تم حفظ الحوار في `{filename}`",

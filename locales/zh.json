@@ -36,7 +36,7 @@
     "config_set_error": "❌ {key} 必须是 {type}",
     "config_invalid": "❌ 格式无效。使用：`/config`，`/config check`，`/config reset` 或 `/config <参数> <值>`",
     "config_unknown": "❌ 未知参数：`{key}`",
-    "config_language_changed": "语言已更改为 `{lang}`。请刷新页面以应用。",
+    "config_language_changed": "语言已更改为 `{lang}`。",
     "save_usage": "❌ 用法：`/save <文件名_无扩展名>`",
     "save_exists": "❌ 文件 `{filename}` 已存在。请选择其他名称。",
     "save_ok": "✅ 对话已保存到 `{filename}`",

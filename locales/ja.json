@@ -36,7 +36,7 @@
     "config_set_error": "❌ {key} は {type} である必要があります",
     "config_invalid": "❌ 無効な形式です。使用法: `/config`, `/config check`, `/config reset` または `/config <パラメータ> <値>`",
     "config_unknown": "❌ 不明なパラメータ: `{key}`",
-    "config_language_changed": "言語を `{lang}` に変更しました。ページを更新して適用してください。",
+    "config_language_changed": "言語を `{lang}` に変更しました。",
     "save_usage": "❌ 使用法: `/save <拡張子なしのファイル名>`",
     "save_exists": "❌ ファイル `{filename}` は既に存在します。別の名前を選んでください。",
     "save_ok": "✅ ダイアログを `{filename}` に保存しました",

@@ -36,7 +36,7 @@
     "config_set_error": "❌ {key} deve essere {type}",
     "config_invalid": "❌ Formato non valido. Usa: `/config`, `/config check`, `/config reset` o `/config <parametro> <valore>`",
     "config_unknown": "❌ Parametro sconosciuto: `{key}`",
-    "config_language_changed": "Lingua cambiata in `{lang}`. Aggiorna la pagina per applicare.",
+    "config_language_changed": "Lingua cambiata in `{lang}`.",
     "save_usage": "❌ Uso: `/save <nome_senza_estensione>`",
     "save_exists": "❌ Il file `{filename}` esiste già. Scegli un altro nome.",
     "save_ok": "✅ Dialogo salvato in `{filename}`",
