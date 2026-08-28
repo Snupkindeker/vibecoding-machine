@@ -45,8 +45,8 @@ with st.sidebar:
     st.write(f"**{t('sidebar_github_username')}:** `{config.github_username}`")
     st.write(f"**{t('sidebar_coding_case')}:** `{config.coding_case}`")
     st.write(f"**{t('sidebar_use_markdown')}:** `{config.use_markdown}`")
-    langs = ['en', 'ru']
-    langs_dict = {'🇬🇧 English': 'en', '🇷🇺 Русский': 'ru'}
+    langs = ['en', 'ru', 'es', 'fr', 'zh']
+    langs_dict = {'🇬🇧 English': 'en', '🇷🇺 Русский': 'ru', '🇪🇸 Español': 'es', '🇫🇷 Français': 'fr', '🇨🇳 中文': 'zh'}
     current_lang = config.language if config.language in langs else 'en'
     selected_lang = langs_dict[st.selectbox(f"**{t('sidebar_language')}:**", langs_dict.keys(), index=langs.index(current_lang))]
     if selected_lang != config.language:
