@@ -34,7 +34,7 @@ def main():
     while True:
         try:
             prompt = make_context("user", input(palette.italic + "Type your message here: \n" + palette.blue))
-            if not prompt['content'].strip():
+            if prompt['content'].strip() == "" or prompt['content']== "":
                 continue
             print(palette.normal, end="")
             if prompt['content'] == "/stop":
@@ -197,7 +197,7 @@ def main():
                 try:
                     os.remove(dialog_path)
 
-                    logger.info(palette.red + f"Successfully deleted the saved dialog from {dialog_path}." + palette.normal)
+                    logger.info(palette.green + f"Successfully deleted the saved dialog from {dialog_path}." + palette.normal)
                 except FileNotFoundError:
                     logger.error(palette.red + "The file doesn't exist. Please choose another file name." + palette.normal)
                 except PermissionError:
