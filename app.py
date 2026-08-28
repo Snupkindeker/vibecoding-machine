@@ -264,7 +264,7 @@ def handle_command(command: str) -> str | None:
 
 
 # Поле ввода
-if prompt := st.chat_input("..."):
+if prompt := st.chat_input(t("prompt_field")):
     if prompt.startswith('/'):
         result = handle_command(prompt)
         if result:
