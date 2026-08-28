@@ -34,6 +34,7 @@ def main():
             prompt = make_context("user", input(palette.italic + "Type your message here: \n" + palette.blue))
             print(palette.normal, end="")
             if prompt['content'] == "/stop":
+                logger.warning(palette.yellow + "Caught /stop, shutting down..." + palette.normal)
                 break
             elif prompt['content'] == "/wipe":
                 messages = [system_context()]
@@ -190,7 +191,7 @@ def main():
                 messages = run_cycle(messages)
 
         except KeyboardInterrupt:
-            logger.info("Caught KeyboardInterrupt. Shutting down...")
+            logger.warning(palette.yellow + "Caught KeyboardInterrupt. Shutting down..." + palette.normal)
             exit()
         except Exception as e:
             logger.error(palette.red + str(e) + palette.normal)
