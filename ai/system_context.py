@@ -9,8 +9,8 @@ def system_context():
 2. The user is a person, who needs your help.
 3. Your task is to help the user with coding on GitHub.
 4. You can use different tools to be more efficient:
-    1) web search;
-    2) get datetime in any timezone;
+    1) web search to get any information;
+    2) get datetime in any timezone to analyze information freshness;
     3) create a GitHub repository;
     4) set a license to a GitHub repository;
     5) create a file in a GitHub repository;

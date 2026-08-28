@@ -1,9 +1,11 @@
 import openai
+import logging
 from httpx import Client
 
 from system_context import make_context, system_context
 from tools import *
 from config import model_name, model_operation_limit
+from palette import Palette
 
 
 load_dotenv()
@@ -19,6 +21,10 @@ ai_client = openai.OpenAI(
     api_key=ai_key,
     http_client=http_client
 )
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
+logger = logging.getLogger(__name__)
+palette = Palette()
 
 
 def run_cycle(messages: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -55,9 +61,9 @@ def run_cycle(messages: list[dict[str, str]]) -> list[dict[str, str]]:
             break
 
     if iteration_count >= max_iterations:
-        print("Warning: Maximum iterations reached")
+        logger.warning(palette.yellow + "Warning: Maximum iterations reached" + palette.normal)
 
-    print(messages[-1]['content'])
+    print(palette.white + messages[-1]['content'] + palette.normal)
     return messages
 
 
