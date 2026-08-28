@@ -34,7 +34,7 @@ def main():
             prompt = make_context("user", input(palette.italic + "Type your message here: \n" + palette.blue))
             print(palette.normal, end="")
             if prompt['content'] == "/stop":
-                logger.warning(palette.yellow + "Caught /stop, shutting down..." + palette.normal)
+                logger.warning(palette.yellow + "Caught /stop. Shutting down..." + palette.normal)
                 break
             elif prompt['content'] == "/wipe":
                 messages = [system_context()]
@@ -127,7 +127,7 @@ def main():
                                 logger.error(palette.red + f"An error occurred while checking config: {error}" + palette.normal)
                         case "reset":
                             config.set_default_config()
-                            logger.info(palette.green + "Config reset successfully." + palette.normal)
+                            logger.info(palette.green + "Config reset successfully. No errors found." + palette.normal)
                         case _:
                             logger.error(palette.red + "The command argument is invalid. Use /help for more information." + palette.normal)
                 else:
@@ -137,7 +137,10 @@ def main():
                 print(palette.purple + "/help - view this menu.")
                 print("/config <var/check/reset> [value] - get a config value, set it to a new value, check the config or reset it to default.")
                 print("/wipe - wipe the dialog context.")
-                print("/stop - stop the program." + palette.normal)
+                print("/stop (or CTRL + C) - stop the program.")
+                print("/save <filename> - save the current dialog to a file.")
+                print("/load <filename> - load the current dialog from a file.")
+                print("/del <filename> - delete a dialog file." + palette.normal)
 
             elif prompt['content'].find("/save") == 0:
                 args = prompt['content'].split()
@@ -191,7 +194,7 @@ def main():
                 messages = run_cycle(messages)
 
         except KeyboardInterrupt:
-            logger.warning(palette.yellow + "Caught KeyboardInterrupt. Shutting down..." + palette.normal)
+            logger.warning(palette.yellow + "Caught CTRL + C. Shutting down..." + palette.normal)
             exit()
         except Exception as e:
             logger.error(palette.red + str(e) + palette.normal)
