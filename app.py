@@ -45,8 +45,8 @@ with st.sidebar:
     st.write(f"**{t('sidebar_github_username')}:** `{config.github_username}`")
     st.write(f"**{t('sidebar_coding_case')}:** `{config.coding_case}`")
     st.write(f"**{t('sidebar_use_markdown')}:** `{config.use_markdown}`")
-    langs = ['en', 'ru', 'es', 'fr', 'zh', 'ar', 'de', 'ko', 'pt']
-    langs_dict = {'🇬🇧 English': 'en', '🇷🇺 Русский': 'ru', '🇪🇸 Español': 'es', '🇫🇷 Français': 'fr', '🇨🇳 中文': 'zh', '🇸🇦 العربية': 'ar', '🇩🇪 Deutsch': 'de', '🇰🇷 한국어': 'ko', '🇧🇷 Português': 'pt'}
+    langs = ['en', 'ru', 'es', 'fr', 'zh', 'ar', 'de', 'ko', 'pt', 'ja', 'hi', 'bn', 'it']
+    langs_dict = {'🇬🇧 English': 'en', '🇷🇺 Русский': 'ru', '🇪🇸 Español': 'es', '🇫🇷 Français': 'fr', '🇨🇳 中文': 'zh', '🇸🇦 العربية': 'ar', '🇩🇪 Deutsch': 'de', '🇰🇷 한국어': 'ko', '🇧🇷 Português': 'pt', '🇯🇵 日本語': 'ja', '🇮🇳 हिन्दी': 'hi', '🇧🇩 বাংলা': 'bn', '🇮🇹 Italiano': 'it'}
     current_lang = config.language if config.language in langs else 'en'
     selected_lang = langs_dict[st.selectbox(f"**{t('sidebar_language')}:**", langs_dict.keys(), index=langs.index(current_lang))]
     if selected_lang != config.language:
