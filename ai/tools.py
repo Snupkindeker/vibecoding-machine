@@ -69,7 +69,7 @@ def get_datetime(timezone: str) -> str | None:
             return "Invalid timezone specified"
 
     try:
-        response = requests.get('https://time.now/developer/api/timezone/Asia/Tokyo')
+        response = requests.get(f'https://time.now/developer/api/timezone/{timezone}')
         response.raise_for_status()
         data = response.json()
     except requests.exceptions.ConnectTimeout:
@@ -436,4 +436,4 @@ TOOL_MAPPING = {
 
 
 if __name__ == '__main__':
-    print(run_code("python", "print('Hello World)"))
+    print(run_code("python", "from datetime import datetime, timezone, timedelta\n\n# Нью-Йорк: EST = UTC-5, EDT = UTC-4 (летнее время)\n# Август - летнее время, значит UTC-4\nny_offset = timedelta(hours=-4)\nny_time = datetime.now(timezone.utc) + ny_offset\n\nprint(\"UTC time:    \", datetime.now(timezone.utc).strftime(\"%Y-%m-%d %H:%M:%S\"))\nprint(\"NY time:     \", ny_time.strftime(\"%Y-%m-%d %H:%M:%S\"))\nprint(\"Day of week: \", ny_time.strftime(\"%A\"))"))
