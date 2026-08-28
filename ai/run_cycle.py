@@ -7,9 +7,10 @@ from tools import *
 from config import model_name, model_operation_limit
 from palette import Palette
 
+from dotenv import load_dotenv
+from os import getenv
 
 load_dotenv()
-github_key = getenv("GITHUB_PAT")
 ai_key = getenv("AI_API_KEY")
 ai_endpoint = getenv("AI_API_ENDPOINT")
 
@@ -54,7 +55,8 @@ def run_cycle(messages: list[dict[str, str]]) -> list[dict[str, str]]:
         iteration_count += 1
         resp = call_llm(messages)
 
-        print(resp.choices[0].message.tool_calls)
+        if logger.isEnabledFor(logging.DEBUG):
+            print(resp.choices[0].message.tool_calls)
         if resp.choices[0].message.tool_calls is not None:
             messages.append(get_tool_response(resp))
         else:
