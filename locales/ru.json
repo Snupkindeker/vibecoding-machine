@@ -61,7 +61,7 @@
     "terminal_tool_result": "✅ Инструмент `{name}` вернул: {result}...",
     "prompt_field": "Введите сообщение или команду...",
     "save_as_title": "💾 Сохранить диалог",
-    "save_as_placeholder": "имя файла (без расширения)",
+    "save_as_placeholder": "Имя файла (без расширения)",
     "save_as_button": "💾 Сохранить как",
     "save_timestamp_button": "⏱️ Сохранить с меткой времени",
     "save_name_required": "Введите имя файла"
