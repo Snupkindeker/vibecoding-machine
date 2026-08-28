@@ -46,8 +46,9 @@ with st.sidebar:
     st.write(f"**{t('sidebar_coding_case')}:** `{config.coding_case}`")
     st.write(f"**{t('sidebar_use_markdown')}:** `{config.use_markdown}`")
     langs = ['en', 'ru']
+    langs_dict = {'🇬🇧 English': 'en', '🇷🇺 Русский': 'ru'}
     current_lang = config.language if config.language in langs else 'en'
-    selected_lang = st.selectbox(t('sidebar_language'), langs, index=langs.index(current_lang))
+    selected_lang = langs_dict[st.selectbox(f"**{t('sidebar_language')}:**", langs_dict.keys(), index=langs.index(current_lang))]
     if selected_lang != config.language:
         if translator.set_language(selected_lang):
             config.language = selected_lang
