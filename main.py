@@ -85,10 +85,12 @@ def main():
                         case "model_operation_limit":
                             if type(args[2]) != str:
                                 raise ValueError("model_operation_limit must be an integer.")
-                            if not args[2].isdigit():
+                            try:
+                                config.model_operation_limit = int(args[2])
+                                logger.info(
+                                    palette.green + f"Model operation limit successfully set to {config.model_operation_limit}." + palette.normal)
+                            except ValueError:
                                 raise ValueError("model_operation_limit must be an integer.")
-                            config.model_operation_limit = args[2]
-                            logger.info(palette.green + f"Model operation limit successfully set to {config.model_operation_limit}." + palette.normal)
                         case "github_username":
                             if type(args[2]) != str:
                                 raise ValueError("github_username must be a string.")
