@@ -63,7 +63,35 @@ with st.sidebar:
         st.session_state.thinking_steps = []
         st.rerun()
 
-    if st.button(t('sidebar_save_dialog')):
+    st.divider()
+    st.subheader(t("save_as_title"))
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        custom_name = st.text_input(t("save_as_placeholder"), placeholder="my_dialog")
+    with col2:
+        if st.button(t("save_as_button")):
+            if custom_name.strip():
+                filename = custom_name.strip() + ".json"
+                filepath = os.path.join(dialogs_dir, filename)
+                if os.path.exists(filepath):
+                    st.error(t('save_exists', filename=filename))
+                else:
+                    try:
+                        with open(filepath, 'w', encoding='utf-8') as f:
+                            json.dump(st.session_state.messages, f, ensure_ascii=False, indent=4)
+                        st.success(t('save_ok', filename=filename))
+                        st.session_state.messages.append({
+                            "role": "assistant",
+                            "content": t('save_ok', filename=filename)
+                        })
+                        st.rerun()
+                    except Exception as e:
+                        st.error(t('save_error', error=str(e)))
+            else:
+                st.warning(t("save_name_required"))
+
+    # Автосохранение с timestamp (можно оставить как есть)
+    if st.button(t("save_timestamp_button")):
         filename = f"dialog_{int(time.time())}.json"
         filepath = os.path.join(dialogs_dir, filename)
         with open(filepath, 'w', encoding='utf-8') as f:
