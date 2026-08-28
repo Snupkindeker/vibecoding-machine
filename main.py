@@ -6,6 +6,8 @@ import json
 ai_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ai')
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
+dialogs_dir = os.path.join(ai_dir, 'dialogs')
+os.makedirs(dialogs_dir, exist_ok=True)
 
 if ai_dir not in sys.path:
     sys.path.append(ai_dir)
