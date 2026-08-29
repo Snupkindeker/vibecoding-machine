@@ -23,6 +23,8 @@ ai_client = openai.OpenAI(
     http_client=http_client
 )
 
+from logger_setup import setup_logging
+setup_logging(log_to_console=False)  # или True, если нужно видеть логи в консоли
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
 logger = logging.getLogger(__name__)
 palette = Palette()
