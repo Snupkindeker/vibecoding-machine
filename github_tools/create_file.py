@@ -24,7 +24,7 @@ def create_file(repo: str, path: str, content: str, message: str = None, branch:
     except requests.exceptions.HTTPError as e:
         print(e)
 
-    print("Step 1 success")
+    # print("Step 1 success")
 
     encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
     payload = {
