@@ -35,6 +35,7 @@ from logger_setup import setup_logging
 setup_logging(log_to_console=False)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
 logger = logging.getLogger(__name__)
+logger.info("Тестовое сообщение после настройки")
 palette = Palette()
 
 def main():

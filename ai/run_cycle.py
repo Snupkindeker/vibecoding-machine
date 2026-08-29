@@ -1,9 +1,7 @@
-# run_cycle.py (исправленный генератор)
-
 import openai
 import logging
 from httpx import Client
-from system_context import make_context, system_context
+from system_context import make_context
 from tools import *
 from config import model_name, model_operation_limit
 from palette import Palette
@@ -24,9 +22,10 @@ ai_client = openai.OpenAI(
 )
 
 from logger_setup import setup_logging
-setup_logging(log_to_console=False)  # или True, если нужно видеть логи в консоли
+setup_logging(log_to_console=False)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
 logger = logging.getLogger(__name__)
+logger.info("Тестовое сообщение после настройки")
 palette = Palette()
 
 
