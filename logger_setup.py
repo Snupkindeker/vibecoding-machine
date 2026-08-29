@@ -3,52 +3,65 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 
-
-def setup_logging(log_to_console=False, log_file_name="vibecoding.log"):
+def setup_logging(log_to_console=False, log_file_name="log.log"):
     """
-    Настраивает логирование в файл с ротацией и, опционально, в консоль.
-
-    Аргументы:
-        log_to_console (bool): если True, логи также выводятся в консоль.
-        log_file_name (str): имя файла для логов (будет лежать в папке logs/).
+    Настраивает логирование в файл с ротацией.
     """
-    # Определяем корневую папку проекта (там, где лежит этот скрипт)
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Определяем базовую папку: сначала пытаемся взять папку, где лежит main.py,
+    # если нет – текущую рабочую.
+    try:
+        # Если приложение собрано PyInstaller, используем sys._MEIPASS
+        base_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        # Но в портативной версии лучше взять текущую рабочую папку
+        base_dir = os.getcwd()
+    except Exception:
+        base_dir = os.getcwd()
+
     logs_dir = os.path.join(base_dir, 'logs')
-    os.makedirs(logs_dir, exist_ok=True)
+    try:
+        os.makedirs(logs_dir, exist_ok=True)
+    except Exception as e:
+        # print(f"Не удалось создать папку {logs_dir}: {e}")
+        # Попробуем использовать текущую папку
+        logs_dir = os.getcwd()
 
     log_file_path = os.path.join(logs_dir, log_file_name)
+    # print(f"Логи будут писаться в: {log_file_path}")  # отладка
 
-    # Создаём корневой логгер
+    # Очищаем существующие обработчики корневого логгера
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
-
-    # Удаляем все существующие обработчики (чтобы избежать дублирования)
     for handler in root_logger.handlers[:]:
         root_logger.removeHandler(handler)
 
-    # Формат логов
+    root_logger.setLevel(logging.INFO)
+
     formatter = logging.Formatter(
         '%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
 
-    # Обработчик для файла (с ротацией, макс. размер 5 МБ, храним 3 файла)
-    file_handler = RotatingFileHandler(
-        log_file_path, maxBytes=5 * 1024 * 1024, backupCount=3, encoding='utf-8'
-    )
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(formatter)
-    root_logger.addHandler(file_handler)
+    try:
+        file_handler = RotatingFileHandler(
+            log_file_path, maxBytes=5*1024*1024, backupCount=3, encoding='utf-8'
+        )
+        file_handler.setLevel(logging.INFO)
+        file_handler.setFormatter(formatter)
+        root_logger.addHandler(file_handler)
+        # print(f"Обработчик файла добавлен: {log_file_path}")
+    except Exception as e:
+        print(f"Error while creating file processor: {e}")
 
-    # Если нужен вывод в консоль (например, для отладки)
     if log_to_console:
         console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setLevel(logging.INFO)
         console_handler.setFormatter(formatter)
         root_logger.addHandler(console_handler)
 
-    # Подавляем лишние логи от некоторых библиотек (опционально)
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    logging.getLogger("openai").setLevel(logging.WARNING)
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    # Подавляем шум от библиотек
+    for lib in ['httpx', 'openai', 'urllib3']:
+        logging.getLogger(lib).setLevel(logging.WARNING)
+
+    # Тестовое сообщение
+    logging.info("Logging setup successfully!")
+
+# Если нужно, можно сразу вызвать setup_logging() при импорте, но лучше вызывать в main
