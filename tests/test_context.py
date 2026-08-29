@@ -25,5 +25,5 @@ def test_make_context_tool():
 def test_system_context():
     msg = system_context()
     assert msg["role"] == "system"
-    assert "vibecoding-machine" in msg["content"]
-    assert "GitHub" in msg["content"]
+    for word in ["GitHub", "tools", "help", "user", "assistant", "restrictions", "security", "politely"]:
+        assert word in msg["content"]
