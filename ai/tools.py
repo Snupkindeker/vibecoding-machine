@@ -6,6 +6,7 @@ import base64
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
+langs_path = os.path.join(current_dir, 'langs.json')
 
 if current_dir not in sys.path:
     sys.path.append(current_dir)
@@ -70,8 +71,10 @@ def get_datetime(timezone: str) -> str | None:
 
     try:
         response = requests.get(f'https://time.now/developer/api/timezone/{timezone}')
+        # print(response)
         response.raise_for_status()
         data = response.json()
+        # print(data)
     except requests.exceptions.ConnectTimeout:
         return "Connection timed out. Don't try again more than 3 times."
     except requests.exceptions.ConnectionError:
@@ -130,7 +133,7 @@ def run_code(language: str, code: str, stdin: str = "") -> dict | None:
         raise ValueError("Invalid arguments: language and code must be strings")
 
     language = language.lower()
-    with open("langs.json", "r", encoding="utf-8") as f:
+    with open(langs_path, "r", encoding="utf-8") as f:
         valid_langs: dict = json.load(f)
     if language not in valid_langs.keys():
         raise ValueError(f"Invalid language. Supported: {', '.join(valid_langs.keys())}")
@@ -141,7 +144,7 @@ def run_code(language: str, code: str, stdin: str = "") -> dict | None:
         "https://": proxy_url,
     }
 
-    with open("langs.json", "r", encoding="utf-8") as f:
+    with open(langs_path, "r", encoding="utf-8") as f:
         language_id = valid_langs[language]
 
     source_code_b64 = base64.b64encode(code.encode('utf-8')).decode('utf-8')
@@ -436,4 +439,4 @@ TOOL_MAPPING = {
 
 
 if __name__ == '__main__':
-    print(run_code("python", "from datetime import datetime, timezone, timedelta\n\n# Нью-Йорк: EST = UTC-5, EDT = UTC-4 (летнее время)\n# Август - летнее время, значит UTC-4\nny_offset = timedelta(hours=-4)\nny_time = datetime.now(timezone.utc) + ny_offset\n\nprint(\"UTC time:    \", datetime.now(timezone.utc).strftime(\"%Y-%m-%d %H:%M:%S\"))\nprint(\"NY time:     \", ny_time.strftime(\"%Y-%m-%d %H:%M:%S\"))\nprint(\"Day of week: \", ny_time.strftime(\"%A\"))"))
+    print(get_datetime("EST"))
