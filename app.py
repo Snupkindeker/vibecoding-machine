@@ -107,7 +107,7 @@ with st.sidebar:
     files = [f for f in os.listdir(dialogs_dir) if f.endswith('.json')]
     if files:
         st.subheader(t('sidebar_select_file'))
-        selected = st.selectbox("", files)
+        selected = st.selectbox(" ", files)
         col1, col2 = st.columns(2)
         with col1:
             if st.button(t('sidebar_load_dialog')):
