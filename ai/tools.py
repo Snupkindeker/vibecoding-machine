@@ -393,8 +393,8 @@ tools = [
     {
         "type": "function",
         "function": {
-            "name": "read_file",
-            "description": "Read a file in a github repository.",
+            "name": "write_file",
+            "description": "Write a file in a github repository.",
             "parameters": {
                 "type": "object",
                 "properties": {
