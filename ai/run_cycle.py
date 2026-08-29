@@ -1,9 +1,9 @@
 import openai
 import logging
 from httpx import Client
-from system_context import make_context
-from tools import *
-from config import model_name, model_operation_limit
+from ai.make_context import make_context
+from ai.tools import *
+from ai.config import model_name, model_operation_limit
 from palette import Palette
 from dotenv import load_dotenv
 from os import getenv
