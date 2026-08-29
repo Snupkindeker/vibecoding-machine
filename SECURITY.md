@@ -26,7 +26,7 @@ We appreciate your help in keeping this project secure. If you discover a securi
    - Steps to reproduce it.
    - Potential impact and exploitation scenarios.
    - Any possible fixes or mitigation suggestions.
-3. **Expect a response within 48 hours** (not 2 weeks — we aim to be faster).
+3. **Expect a response within 72 hours**.
 4. **If your report is accepted**:
    - The vulnerability will be fixed within **30 days** (depending on complexity).
    - You will be credited for the discovery (if you wish).
@@ -66,7 +66,7 @@ We follow a responsible disclosure process:
 
 - 📧 **Email**: snupkindeker@yandex.ru  
 - 💬 **Telegram**: [@bedwarsskill](https://t.me/bedwarsskill)  
-- 📅 **Response SLA**: 120 hours (business days)
+- 📅 **Response SLA**: 72 hours (business days)
 
 ---
 
