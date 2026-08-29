@@ -18,7 +18,7 @@ def create_file(repo: str, path: str, content: str, message: str = None, branch:
         headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github_tools.v3+json"}
         resp = requests.get(check_url, headers=headers)
         if resp.status_code == 200:
-            raise Exception(f"The {path} file already exists. Use write_file to rewrite it.")
+            raise FileExistsError(f"The {path} file already exists. Use write_file to rewrite it.")
         elif resp.status_code != 404:
             resp.raise_for_status()
     except requests.exceptions.HTTPError as e:
