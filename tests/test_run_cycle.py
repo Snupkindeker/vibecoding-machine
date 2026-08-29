@@ -17,11 +17,13 @@ def initial_messages():
         make_context("user", "What time is it in UTC?")
     ]
 
-# ----------------------------------------------
-# Тест 1: Модель не вызывает инструменты (простой ответ)
-# ----------------------------------------------
-@patch('ai.run_cycle.ai_client')
-def test_run_cycle_no_tools(mock_client, initial_messages):
+# ------------------------------------------------------------
+# Тест 1: Модель не вызывает инструменты
+# ------------------------------------------------------------
+@patch('ai.run_cycle.get_ai_client')   # <- мокаем функцию, а не переменную
+def test_run_cycle_no_tools(mock_get_client, initial_messages):
+    # Создаём мок-клиент
+    mock_client = MagicMock()
     mock_response = MagicMock()
     mock_response.choices = [
         MagicMock(message=MagicMock(
@@ -31,24 +33,28 @@ def test_run_cycle_no_tools(mock_client, initial_messages):
         ))
     ]
     mock_client.chat.completions.create.return_value = mock_response
+    mock_get_client.return_value = mock_client   # <- возвращаем мок-клиент
 
     events = list(run_cycle(initial_messages))
 
-    # Проверяем, что сообщение ассистента добавлено в конец
-    assert len(initial_messages) == 3  # system + user + assistant
+    assert len(initial_messages) == 3
     assert initial_messages[-1]["role"] == "assistant"
     assert "12:34" in initial_messages[-1]["content"]
-    # Проверяем финальное событие
     final_events = [e for e in events if e['type'] == 'final_answer']
     assert len(final_events) == 1
+    # Проверяем, что клиент вызван один раз
     assert mock_client.chat.completions.create.call_count == 1
 
-# ----------------------------------------------
+# ------------------------------------------------------------
 # Тест 2: Модель вызывает один инструмент (get_datetime)
-# ----------------------------------------------
-@patch('ai.run_cycle.ai_client')
-@patch('ai.tools.get_datetime')  # мокаем функцию в модуле tools
-def test_run_cycle_tool_call(mock_get_datetime, mock_client, initial_messages):
+# ------------------------------------------------------------
+@patch('ai.run_cycle.get_ai_client')    # <- мокаем функцию
+@patch('ai.tools.get_datetime')         # <- мокаем сам инструмент
+def test_run_cycle_tool_call(mock_get_datetime, mock_get_client, initial_messages):
+    # Создаём мок-клиент
+    mock_client = MagicMock()
+
+    # Первый ответ – вызов get_datetime
     mock_tool_call = MagicMock()
     mock_tool_call.function.name = "get_datetime"
     mock_tool_call.function.arguments = json.dumps({"timezone": "UTC"})
@@ -62,6 +68,7 @@ def test_run_cycle_tool_call(mock_get_datetime, mock_client, initial_messages):
             model_dump=lambda: {"role": "assistant", "tool_calls": [{"function": {"name": "get_datetime", "arguments": '{"timezone": "UTC"}'}}]}
         ))
     ]
+    # Второй ответ – без tool_calls
     mock_response2 = MagicMock()
     mock_response2.choices = [
         MagicMock(message=MagicMock(
@@ -71,21 +78,20 @@ def test_run_cycle_tool_call(mock_get_datetime, mock_client, initial_messages):
         ))
     ]
     mock_client.chat.completions.create.side_effect = [mock_response1, mock_response2]
+    mock_get_client.return_value = mock_client
 
+    # Мокаем результат выполнения инструмента
     mock_get_datetime.return_value = {"datetime": "2026-08-29 14:30:00", "timezone": "UTC"}
 
     events = list(run_cycle(initial_messages))
 
-    # Должно быть: system, user, assistant1 (tool_calls), tool, assistant2 (final) = 5
     assert len(initial_messages) == 5
-    # Проверяем наличие tool-сообщения
     tool_msgs = [m for m in initial_messages if m["role"] == "tool"]
     assert len(tool_msgs) == 1
     assert "datetime" in tool_msgs[0]["content"]
-    # Последнее сообщение — ассистент с ответом
     assert initial_messages[-1]["role"] == "assistant"
     assert "14:30" in initial_messages[-1]["content"]
-    # Проверяем события
+
     event_types = [e['type'] for e in events]
     assert 'llm_call' in event_types
     assert 'tool_call' in event_types
@@ -93,12 +99,15 @@ def test_run_cycle_tool_call(mock_get_datetime, mock_client, initial_messages):
     assert 'final_answer' in event_types
     assert mock_client.chat.completions.create.call_count == 2
 
-# ----------------------------------------------
+# ------------------------------------------------------------
 # Тест 3: Превышение лимита итераций
-# ----------------------------------------------
-@patch('ai.run_cycle.ai_client')
-@patch('ai.run_cycle.logger')  # мокаем, но проверять не будем
-def test_run_cycle_max_iterations(mock_logger, mock_client, initial_messages):
+# ------------------------------------------------------------
+@patch('ai.run_cycle.get_ai_client')   # <- мокаем функцию
+@patch('ai.run_cycle.logger')          # <- мокаем логгер (но проверять не будем)
+def test_run_cycle_max_iterations(mock_logger, mock_get_client, initial_messages):
+    # Создаём мок-клиент
+    mock_client = MagicMock()
+
     mock_tool_call = MagicMock()
     mock_tool_call.function.name = "get_datetime"
     mock_tool_call.function.arguments = json.dumps({"timezone": "UTC"})
@@ -113,6 +122,7 @@ def test_run_cycle_max_iterations(mock_logger, mock_client, initial_messages):
         ))
     ]
     mock_client.chat.completions.create.return_value = mock_response
+    mock_get_client.return_value = mock_client
 
     with patch('ai.run_cycle.model_operation_limit', 2):
         with patch('ai.tools.get_datetime') as mock_get_datetime:
