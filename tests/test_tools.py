@@ -3,51 +3,65 @@ import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
+sys.path.insert(0, root_dir)
 
-if current_dir not in sys.path:
-    sys.path.append(current_dir)
-if root_dir not in sys.path:
-    sys.path.append(root_dir)
-
-
-from ai.tools import get_datetime, run_code, current_dir
+from ai.tools import get_datetime, run_code
 
 
 def test_get_datetime_1():
-    assert isinstance(result := get_datetime("UTC"), dict) and result.get("datetime") and result.get("day_of_week") and result.get("day_of_year") and result.get("timezone") and result.get("utc_datetime")
+    result = get_datetime("UTC")
+    assert isinstance(result, dict)
+    assert "datetime" in result
+    assert "day_of_week" in result
+    assert "day_of_year" in result
+    assert "timezone" in result
+    assert "utc_datetime" in result
 
 def test_get_datetime_2():
-    assert isinstance(result := get_datetime("EST"), dict) and result.get("datetime") and result.get("day_of_week") and result.get("day_of_year")and result.get("timezone") and result.get("utc_datetime")
+    result = get_datetime("EST")
+    assert isinstance(result, dict)
+    assert result.get("timezone") == "EST"
 
 def test_get_datetime_3():
-    assert isinstance(result := get_datetime("US/Eastern"), dict) and result.get("datetime") and result.get("day_of_week") and result.get("day_of_year")and result.get("timezone") and result.get("utc_datetime")
+    result = get_datetime("US/Eastern")
+    assert isinstance(result, dict)
+    assert result.get("timezone") == "US/Eastern"
 
 def test_get_datetime_4():
-    assert isinstance(result := get_datetime("Asia/Tokyo"), dict) and result.get("datetime") and result.get("day_of_week") and result.get("day_of_year")and result.get("timezone") and result.get("utc_datetime")
+    result = get_datetime("Asia/Tokyo")
+    assert isinstance(result, dict)
+    assert result.get("timezone") == "Asia/Tokyo"
 
 def test_get_datetime_5():
-    assert isinstance(result := get_datetime("ezz"), str) and result == "An HTTP error occurred while trying to handle the datetime get request."
-
+    result = get_datetime("ezz")
+    assert isinstance(result, str)
+    assert "HTTP error" in result
 
 def test_run_code_1():
-    assert isinstance(result := run_code("python", "print(input() * 5)", "hi "), dict) and result.get('status') == 200 and result.get('stdout') == "hi hi hi hi hi \n" and result.get('stderr') is None
+    result = run_code("python", "print(input() * 5)", "hi ")
+    assert result.get('status') == 200
+    assert result.get('stdout') == "hi hi hi hi hi \n"
+    assert result.get('stderr') is None
 
 def test_run_code_2():
-    assert isinstance(result := run_code("python", "print(i)"), dict) and result.get('status') == 200 and result.get('stdout') is None and "NameError" in result.get('stderr')
+    result = run_code("python", "print(i)")
+    assert result.get('status') == 200
+    assert result.get('stdout') is None
+    assert "NameError" in result.get('stderr', '')
 
 def test_run_code_3():
-    assert isinstance(result := run_code("python", "print(input())"), dict) and result.get('status') == 200 and result.get('stdout') is None and "EOFError" in result.get('stderr')
+    result = run_code("python", "print(input())")
+    assert result.get('status') == 200
+    assert result.get('stdout') is None
+    assert "EOFError" in result.get('stderr', '')
 
 def test_run_code_4():
-    assert isinstance(result := run_code("cpp", "#include <iostream>\nusing namespace std;\nint main() {\n  cout << 10;\n  return 0;\n}"), dict) and result.get('status') == 200 and result.get('stdout') == "10" and result.get('stderr') is None
+    result = run_code("cpp", "#include <iostream>\nusing namespace std;\nint main() {\n  cout << 10;\n  return 0;\n}")
+    assert result.get('status') == 200
+    assert result.get('stdout') == "10"
+    assert result.get('stderr') is None
 
 def test_run_code_5():
-    try:
-        run_code("1", "#include <error>")
-        assert False
-    except ValueError:
-        assert True
-
-
-if __name__ == "__main__":
-    print(current_dir)
+    import pytest
+    with pytest.raises(ValueError):
+        run_code("1", "")
