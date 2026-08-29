@@ -1,5 +1,5 @@
-from config import *
-from make_context import make_context
+from ai.config import *
+from ai.make_context import make_context
 
 
 def system_context():
