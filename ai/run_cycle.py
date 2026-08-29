@@ -15,11 +15,6 @@ ai_endpoint = getenv("AI_API_ENDPOINT")
 proxy_url = "http://202.28.194.139:31280"
 http_client = Client(proxy=proxy_url, timeout=30.0)
 
-ai_client = openai.OpenAI(
-    base_url=ai_endpoint,
-    api_key=ai_key,
-    http_client=http_client
-)
 
 from logger_setup import setup_logging
 setup_logging(log_to_console=False)
@@ -28,12 +23,25 @@ logger = logging.getLogger(__name__)
 logger.info("Тестовое сообщение после настройки")
 palette = Palette()
 
+_ai_client = None
+
+def get_ai_client():
+    global _ai_client
+    if _ai_client is None:
+        _ai_client = openai.OpenAI(
+            base_url=ai_endpoint,
+            api_key=ai_key,
+            http_client=http_client
+        )
+    return _ai_client
+
 
 def run_cycle(messages: list[dict[str, str]]):
     """
     Генератор, который выполняет шаги и выдаёт события в реальном времени.
     События: dict с полями 'type' и 'data'
     """
+    ai_client = get_ai_client()
     max_iterations = model_operation_limit
     iteration_count = 0
 
