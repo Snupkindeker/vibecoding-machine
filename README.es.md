@@ -2,7 +2,7 @@
 
 **vibecoding-machine** es un asistente de programación impulsado por IA que conecta un gran modelo de lenguaje (LLM) con herramientas reales para trabajar en GitHub. Chatea con él en tu terminal o en una interfaz web moderna (Streamlit), y él planificará y ejecutará tareas de varios pasos por ti: crear repositorios, gestionar archivos, configurar licencias, buscar en la web y ejecutar código en más de 20 lenguajes de programación.
 
-El asistente construye su comportamiento a partir de tus preferencias (estilo de código, uso de Markdown, lenguajes preferidos), sigue reglas de seguridad (repositorios privados por defecto, sin software ilegal) y te muestra cada paso que da.
+El asistente construye su comportamiento a partir de tus preferencias (estilo de código, uso de Markdown, lenguajes preferidos), sigue reglas de seguridad y te muestra cada paso que da.
 
 [**English**](README.md) | [**Русский**](README.ru.md) | [**Español**](README.es.md) | [**中文**](README.zh.md)
 
