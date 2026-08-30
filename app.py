@@ -208,41 +208,41 @@ def handle_command(command: str) -> str | None:
                     translator.set_language(value)
                     return t('config_language_changed', lang=value)
                 else:
-                    return t('config_set_error', key='language', type='en/ru')
+                    return t('config_set_error', key_='language', type='en/ru')
             elif key == "model_name":
                 config.model_name = value
-                return t('config_set_ok', key='model_name', value=value)
+                return t('config_set_ok', key_='model_name', value=value)
             elif key == "model_operation_limit":
                 try:
                     config.model_operation_limit = int(value)
-                    return t('config_set_ok', key='model_operation_limit', value=value)
+                    return t('config_set_ok', key_='model_operation_limit', value=value)
                 except ValueError:
-                    return t('config_set_error', key='model_operation_limit', type='integer')
+                    return t('config_set_error', key_='model_operation_limit', type='integer')
             elif key == "github_username":
                 config.github_username = value
-                return t('config_set_ok', key='github_username', value=value)
+                return t('config_set_ok', key_='github_username', value=value)
             elif key == "coding_case":
                 if value in ['snake', 'camel', 'pascal']:
                     config.coding_case = value
-                    return t('config_set_ok', key='coding_case', value=value)
+                    return t('config_set_ok', key_='coding_case', value=value)
                 else:
-                    return t('config_set_error', key='coding_case', type='snake/camel/pascal')
+                    return t('config_set_error', key_='coding_case', type='snake/camel/pascal')
             elif key == "use_markdown":
                 if value.lower() in ['true', 'false']:
                     config.use_markdown = value.lower() == 'true'
-                    return t('config_set_ok', key='use_markdown', value=str(config.use_markdown))
+                    return t('config_set_ok', key_='use_markdown', value=str(config.use_markdown))
                 else:
-                    return t('config_set_error', key='use_markdown', type='true/false')
+                    return t('config_set_error', key_='use_markdown', type='true/false')
             elif key == "preferred_languages":
                 if value == "any":
                     config.preferred_languages = []
-                    return t('config_set_ok', key='preferred_languages', value='any')
+                    return t('config_set_ok', key_='preferred_languages', value='any')
                 else:
                     langs = [lang.strip() for lang in value.split(',')]
                     config.preferred_languages = langs
-                    return t('config_set_ok', key='preferred_languages', value=', '.join(langs))
+                    return t('config_set_ok', key_='preferred_languages', value=', '.join(langs))
             else:
-                return t('config_unknown', key=key)
+                return t('config_unknown', key_=key)
         else:
             return t('config_invalid')
     elif cmd == "/save":
