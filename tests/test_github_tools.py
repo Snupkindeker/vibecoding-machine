@@ -128,7 +128,7 @@ def test_delete_file_not_found(mock_get):
 
 @patch('github_tools.get_file_list.requests.get')
 def test_get_file_list_root(mock_get):
-    def side_effect(url, headers):
+    def side_effect(url, headers=None, params=None, **kwargs):
         if url.endswith("/contents/"):
             mock_resp = MagicMock()
             mock_resp.status_code = 200
@@ -143,7 +143,7 @@ def test_get_file_list_root(mock_get):
             mock_resp.json.return_value = []
             return mock_resp
         else:
-            raise AssertionError("Unexpected URL")
+            raise AssertionError(f"Unexpected URL: {url}")
 
     mock_get.side_effect = side_effect
 
