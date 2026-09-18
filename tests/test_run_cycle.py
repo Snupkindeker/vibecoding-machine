@@ -137,3 +137,58 @@ def test_run_cycle_max_iterations(mock_logger, mock_get_client, initial_messages
     # Проверяем, что было 2 итерации (tool_call и tool_result повторились 2 раза)
     tool_calls = [e for e in events if e['type'] == 'tool_call']
     assert len(tool_calls) == 2
+
+# ------------------------------------------------------------
+# Тест 4: Ошибка инструмента не прерывает цикл
+# ------------------------------------------------------------
+@patch('ai.run_cycle.get_ai_client')
+@patch('ai.tools.get_datetime')         # <- мокаем инструмент, который "падает"
+def test_run_cycle_tool_error(mock_get_datetime, mock_get_client, initial_messages):
+    mock_client = MagicMock()
+
+    # Первый ответ – вызов get_datetime
+    mock_tool_call = MagicMock()
+    mock_tool_call.function.name = "get_datetime"
+    mock_tool_call.function.arguments = json.dumps({"timezone": "BAD_TZ"})
+    mock_tool_call.id = "call_err"
+
+    mock_response1 = MagicMock()
+    mock_response1.choices = [
+        MagicMock(message=MagicMock(
+            content=None,
+            tool_calls=[mock_tool_call],
+            model_dump=lambda: {"role": "assistant", "tool_calls": [{"function": {"name": "get_datetime", "arguments": '{"timezone": "BAD_TZ"}'}}]}
+        ))
+    ]
+    # Второй ответ – модель увидела ошибку и продолжила работу
+    mock_response2 = MagicMock()
+    mock_response2.choices = [
+        MagicMock(message=MagicMock(
+            content="The timezone is invalid, let me try UTC instead.",
+            tool_calls=None,
+            model_dump=lambda: {"role": "assistant", "content": "The timezone is invalid, let me try UTC instead."}
+        ))
+    ]
+    mock_client.chat.completions.create.side_effect = [mock_response1, mock_response2]
+    mock_get_client.return_value = mock_client
+
+    # Инструмент выбрасывает исключение
+    mock_get_datetime.side_effect = ValueError("Invalid timezone specified")
+
+    events = list(run_cycle(initial_messages))
+
+    # Цикл НЕ прервался: есть финальный ответ
+    final_events = [e for e in events if e['type'] == 'final_answer']
+    assert len(final_events) == 1
+
+    # Есть событие tool_result с флагом error
+    result_events = [e for e in events if e['type'] == 'tool_result']
+    assert len(result_events) == 1
+    assert result_events[0]['data']['error'] == "Invalid timezone specified"
+
+    # Ошибка попала в историю как результат выполнения инструмента
+    tool_msgs = [m for m in initial_messages if m["role"] == "tool"]
+    assert len(tool_msgs) == 1
+    assert "Invalid timezone specified" in tool_msgs[0]["content"]
+    assert initial_messages[-1]["role"] == "assistant"
+    assert mock_client.chat.completions.create.call_count == 2
