@@ -9,13 +9,22 @@ load_dotenv()
 github_key = getenv("GITHUB_PAT")
 
 
-def read_file(repo: str, path: str) -> str:
+def read_file(repo: str, path: str, branch: str = "main") -> str:
     if not github_key:
-        raise ValueError("The GitHub PAT is invalid. Please provide a valid GitHub PAT to the GITHUB_PAT environment variable.")
+        raise ValueError(
+            "The GitHub PAT is invalid. Please provide a valid GitHub PAT "
+            "to the GITHUB_PAT environment variable."
+        )
 
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
-    headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github_tools.v3+json"}
-    resp = requests.get(url, headers=headers)
+    headers = {
+        "Authorization": f"token {github_key}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    # Указываем ветку через ?ref=<branch>, иначе GitHub вернёт содержимое
+    # из ветки по умолчанию.
+    resp = requests.get(url, headers=headers, params={"ref": branch})
     resp.raise_for_status()
     data = resp.json()
 
@@ -26,5 +35,5 @@ def read_file(repo: str, path: str) -> str:
 
 
 if __name__ == "__main__":
-    print(read_file("Snupkindeker/Ultimathe", ".gitignore"))
-    print(read_file("Snupkindeker/Ultimathe", "Cache/Cache.py"))
+    print(read_file("Snupkindeker/Ultimathe", ".gitignore", branch="main"))
+    print(read_file("Snupkindeker/vibecoding-machine", "pyproject.toml", branch="dev"))
