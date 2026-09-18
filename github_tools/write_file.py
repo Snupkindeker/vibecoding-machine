@@ -9,16 +9,29 @@ load_dotenv()
 github_key = getenv("GITHUB_PAT")
 
 
-def write_file(repo: str, path: str, content: str, message: str = None) -> dict:
+def write_file(
+    repo: str,
+    path: str,
+    content: str,
+    message: str = None,
+    branch: str = "main"
+) -> dict:
     if not github_key:
-        raise ValueError("The GitHub PAT is invalid. Please provide a valid GitHub PAT to the GITHUB_PAT environment variable.")
+        raise ValueError(
+            "The GitHub PAT is invalid. Please provide a valid GitHub PAT "
+            "to the GITHUB_PAT environment variable."
+        )
 
     encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
 
     sha = None
     get_url = f"https://api.github.com/repos/{repo}/contents/{path}"
-    headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github_tools.v3+json"}
-    resp = requests.get(get_url, headers=headers)
+    headers = {
+        "Authorization": f"token {github_key}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    resp = requests.get(get_url, headers=headers, params={"ref": branch})
     if resp.status_code == 200:
         sha = resp.json().get("sha")
     elif resp.status_code != 404:
@@ -30,7 +43,7 @@ def write_file(repo: str, path: str, content: str, message: str = None) -> dict:
     payload = {
         "message": message,
         "content": encoded,
-        "branch": "main"
+        "branch": branch
     }
     if sha:
         payload["sha"] = sha
@@ -42,4 +55,9 @@ def write_file(repo: str, path: str, content: str, message: str = None) -> dict:
 
 
 if __name__ == "__main__":
-    write_file("Snupkindeker/vibecoding-machine", "test.txt", "print('Hi!')")
+    write_file(
+        "Snupkindeker/vibecoding-machine",
+        "test.txt",
+        "print('Hi!')",
+        branch="dev"
+    )
