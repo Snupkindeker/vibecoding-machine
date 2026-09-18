@@ -8,13 +8,18 @@ load_dotenv()
 github_key = getenv("GITHUB_PAT")
 
 
-def get_file_list(repo: str, path: str = "") -> dict:
+def get_file_list(repo: str, path: str = "", branch: str = "main") -> dict:
     if not github_key:
         raise ValueError("Invalid GitHub PAT.")
 
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
-    headers = {"Authorization": f"token {github_key}", "Accept": "application/vnd.github.v3+json"}
-    resp = requests.get(url, headers=headers)
+    headers = {
+        "Authorization": f"token {github_key}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    # ?ref=<branch> — чтобы смотреть дерево именно нужной ветки.
+    resp = requests.get(url, headers=headers, params={"ref": branch})
 
     if resp.status_code == 404:
         if path == "":
@@ -29,7 +34,8 @@ def get_file_list(repo: str, path: str = "") -> dict:
         if item["type"] == "file":
             result.append(item["name"])
         elif item["type"] == "dir":
-            sub = get_file_list(repo, item["path"])
+            # Прокидываем branch дальше в рекурсию.
+            sub = get_file_list(repo, item["path"], branch=branch)
             if "error" in sub:
                 return sub
             result.append({item["name"]: sub.get("files", [])})
@@ -37,4 +43,4 @@ def get_file_list(repo: str, path: str = "") -> dict:
 
 
 if __name__ == "__main__":
-    print(get_file_list("Snupkindeker/Ultimathe", "."))
+    print(get_file_list("Snupkindeker/Ultimathe", ".", branch="main"))
