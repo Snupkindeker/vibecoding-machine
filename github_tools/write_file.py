@@ -56,7 +56,7 @@ def write_file(
 
 if __name__ == "__main__":
     write_file(
-        "Snupkindeker/vibecoding-machine",
+        "Snupkindeker/TestRepo",
         "test.txt",
         "print('Hi!')",
         branch="dev"
