@@ -317,7 +317,11 @@ if prompt := st.chat_input(t("prompt_field")):
                     st.session_state.thinking_steps.append(msg)
                 elif event['type'] == 'tool_result':
                     result_preview = json.dumps(event['data']['result'], ensure_ascii=False)[:200]
-                    msg = t('thinking_tool_result', name=event['data']['name'], result=result_preview)
+                    if event['data'].get('error'):
+                        # Ошибка инструмента — показываем красным
+                        msg = f":red[{t('thinking_tool_error', name=event['data']['name'], result=result_preview)}]"
+                    else:
+                        msg = t('thinking_tool_result', name=event['data']['name'], result=result_preview)
                     status.write(msg)
                     st.session_state.thinking_steps.append(msg)
                 elif event['type'] == 'final_answer':
