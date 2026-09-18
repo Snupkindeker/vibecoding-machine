@@ -12,7 +12,7 @@ load_dotenv()
 ai_key = getenv("AI_API_KEY")
 ai_endpoint = getenv("AI_API_ENDPOINT")
 
-proxy_url = "http://202.28.194.139:31280"
+proxy_url = getenv("PROXY_URL", "http://202.28.194.139:31280")
 http_client = Client(proxy=proxy_url, timeout=30.0)
 
 
