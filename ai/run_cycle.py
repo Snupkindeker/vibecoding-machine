@@ -13,7 +13,10 @@ ai_key = getenv("AI_API_KEY")
 ai_endpoint = getenv("AI_API_ENDPOINT")
 
 proxy_url = getenv("PROXY_URL", None) # "http://202.28.194.139:31280")
-http_client = Client(proxy=proxy_url, timeout=30.0)
+if proxy_url is None:
+    http_client = Client(timeout=20.0)
+else:
+    http_client = Client(proxy=proxy_url, timeout=20.0)
 
 
 from logger_setup import setup_logging
