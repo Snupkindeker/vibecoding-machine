@@ -1,5 +1,6 @@
 import openai
 import logging
+import json
 from httpx import Client
 from ai.make_context import make_context
 from ai.tools import *
@@ -93,8 +94,16 @@ def run_cycle(messages: list[dict[str, str]]):
                 }
             }
 
-            # 3. Выполняем инструмент
-            tool_result = TOOL_MAPPING[tool_name](**tool_args)
+            # 3. Выполняем инструмент. Ошибки НЕ прерывают цикл:
+            #    они возвращаются как результат выполнения, чтобы модель
+            #    увидела ошибку и продолжила работу (например, исправила аргументы).
+            tool_error = None
+            try:
+                tool_result = TOOL_MAPPING[tool_name](**tool_args)
+            except Exception as e:
+                tool_error = str(e)
+                tool_result = {"error": tool_error}
+                logger.error(f"Tool '{tool_name}' failed: {tool_error}")
             content = json.dumps(tool_result, ensure_ascii=False)
 
             # 4. Событие: результат инструмента
@@ -102,7 +111,8 @@ def run_cycle(messages: list[dict[str, str]]):
                 'type': 'tool_result',
                 'data': {
                     'name': tool_name,
-                    'result': tool_result
+                    'result': tool_result,
+                    'error': tool_error  # None — успех, str — ошибка
                 }
             }
 
