@@ -416,6 +416,10 @@ tools = [
                     "message": {
                         "type": "string",
                         "description": 'The commit message.'
+                    },
+                    "branch": {
+                        "type": "string",
+                        "description": 'The branch name you want to write the file in. Defaults to main if not given.'
                     }
                 },
                 "required": ["repo", "path", "content"]
