@@ -43,6 +43,11 @@ if "thinking_steps" not in st.session_state:
 dialogs_dir = os.path.join(ai_dir, 'dialogs')
 os.makedirs(dialogs_dir, exist_ok=True)
 
+# Список поддерживаемых языков программирования (для редактора конфига)
+VALID_LANGS = ['assembly', 'bash', 'basic', 'c++', 'cpp', 'c#', 'csharp', 'c', 'go',
+               'java', 'js', 'javascript', 'kotlin', 'lua', 'pascal', 'php', 'python',
+               'ruby', 'rust', 'sql', 'sqlite', 'swift', 'typescript', 'visual_basic']
+
 st.set_page_config(page_title=t('app_title'), layout="wide")
 st.title(t('app_title'))
 st.caption(t('app_caption'))
@@ -63,6 +68,26 @@ with st.sidebar:
         if translator.set_language(selected_lang):
             config.language = selected_lang
             st.success(t('config_language_changed', lang=selected_lang))
+            st.rerun()
+
+    # Кнопка Edit config — всплывающее окно для удобного изменения конфига
+    with st.popover(t('edit_config_button'), use_container_width=True):
+        st.subheader(t('edit_config_title'))
+        new_model = st.text_input(t('edit_config_model'), value=config.model_name)
+        new_limit = st.number_input(t('edit_config_limit'), min_value=1, value=int(config.model_operation_limit), step=1)
+        new_username = st.text_input(t('edit_config_username'), value=config.github_username)
+        new_case = st.selectbox(t('edit_config_case'), ['snake', 'camel', 'pascal'],
+                                index=['snake', 'camel', 'pascal'].index(config.coding_case))
+        new_markdown = st.checkbox(t('edit_config_markdown'), value=config.use_markdown)
+        new_langs = st.multiselect(t('edit_config_languages'), VALID_LANGS, default=config.preferred_languages)
+        if st.button(t('edit_config_save'), type="primary"):
+            config.model_name = new_model
+            config.model_operation_limit = int(new_limit)
+            config.github_username = new_username
+            config.coding_case = new_case
+            config.use_markdown = new_markdown
+            config.preferred_languages = list(new_langs)
+            st.success(t('edit_config_saved'))
             st.rerun()
 
     st.divider()
