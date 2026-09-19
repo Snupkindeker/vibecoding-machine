@@ -23,6 +23,16 @@ else:
     config.language = 'en'
     translator.set_language('en')
 
+
+def escape_markdown(text: str) -> str:
+    """
+    Экранирует markdown-спецсимволы (backticks, *, _, # и т.д.),
+    чтобы они отображались буквально и не ломали разметку.
+    """
+    special_chars = '\\`*_{}[]()#+-.!|>'
+    return ''.join(f'\\{ch}' if ch in special_chars else ch for ch in text)
+
+
 # Инициализация состояния сессии
 if "messages" not in st.session_state:
     st.session_state.messages = [system_context()]
@@ -311,12 +321,12 @@ if prompt := st.chat_input(t("prompt_field")):
                     status.write(msg)
                     st.session_state.thinking_steps.append(msg)
                 elif event['type'] == 'tool_call':
-                    args_str = json.dumps(event['data']['arguments'], ensure_ascii=False)
+                    args_str = escape_markdown(json.dumps(event['data']['arguments'], ensure_ascii=False))
                     msg = t('thinking_tool_call', name=event['data']['name'], args=args_str)
                     status.write(msg)
                     st.session_state.thinking_steps.append(msg)
                 elif event['type'] == 'tool_result':
-                    result_preview = json.dumps(event['data']['result'], ensure_ascii=False)[:200]
+                    result_preview = escape_markdown(json.dumps(event['data']['result'], ensure_ascii=False)[:200])
                     if event['data'].get('error'):
                         # Ошибка инструмента — показываем красным
                         msg = f":red[{t('thinking_tool_error', name=event['data']['name'], result=result_preview)}]"
