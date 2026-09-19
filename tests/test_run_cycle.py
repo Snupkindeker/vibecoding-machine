@@ -49,8 +49,7 @@ def test_run_cycle_no_tools(mock_get_client, initial_messages):
 # Тест 2: Модель вызывает один инструмент (get_datetime)
 # ------------------------------------------------------------
 @patch('ai.run_cycle.get_ai_client')    # <- мокаем функцию
-@patch('ai.tools.get_datetime')         # <- мокаем сам инструмент
-def test_run_cycle_tool_call(mock_get_datetime, mock_get_client, initial_messages):
+def test_run_cycle_tool_call(mock_get_client, initial_messages):
     # Создаём мок-клиент
     mock_client = MagicMock()
 
@@ -80,10 +79,13 @@ def test_run_cycle_tool_call(mock_get_datetime, mock_get_client, initial_message
     mock_client.chat.completions.create.side_effect = [mock_response1, mock_response2]
     mock_get_client.return_value = mock_client
 
-    # Мокаем результат выполнения инструмента
-    mock_get_datetime.return_value = {"datetime": "2026-08-29 14:30:00", "timezone": "UTC"}
+    # Мокаем результат выполнения инструмента через TOOL_MAPPING,
+    # т.к. run_cycle вызывает инструменты через этот словарь
+    def fake_get_datetime(**kwargs):
+        return {"datetime": "2026-08-29 14:30:00", "timezone": "UTC"}
 
-    events = list(run_cycle(initial_messages))
+    with patch.dict('ai.tools.TOOL_MAPPING', {'get_datetime': fake_get_datetime}):
+        events = list(run_cycle(initial_messages))
 
     assert len(initial_messages) == 5
     tool_msgs = [m for m in initial_messages if m["role"] == "tool"]
@@ -124,9 +126,11 @@ def test_run_cycle_max_iterations(mock_logger, mock_get_client, initial_messages
     mock_client.chat.completions.create.return_value = mock_response
     mock_get_client.return_value = mock_client
 
+    def fake_get_datetime(**kwargs):
+        return {"datetime": "now"}
+
     with patch('ai.run_cycle.model_operation_limit', 2):
-        with patch('ai.tools.get_datetime') as mock_get_datetime:
-            mock_get_datetime.return_value = {"datetime": "now"}
+        with patch.dict('ai.tools.TOOL_MAPPING', {'get_datetime': fake_get_datetime}):
             events = list(run_cycle(initial_messages))
 
     # Проверяем наличие события warning
@@ -142,8 +146,7 @@ def test_run_cycle_max_iterations(mock_logger, mock_get_client, initial_messages
 # Тест 4: Ошибка инструмента не прерывает цикл
 # ------------------------------------------------------------
 @patch('ai.run_cycle.get_ai_client')
-@patch('ai.tools.get_datetime')         # <- мокаем инструмент, который "падает"
-def test_run_cycle_tool_error(mock_get_datetime, mock_get_client, initial_messages):
+def test_run_cycle_tool_error(mock_get_client, initial_messages):
     mock_client = MagicMock()
 
     # Первый ответ – вызов get_datetime
@@ -172,10 +175,12 @@ def test_run_cycle_tool_error(mock_get_datetime, mock_get_client, initial_messag
     mock_client.chat.completions.create.side_effect = [mock_response1, mock_response2]
     mock_get_client.return_value = mock_client
 
-    # Инструмент выбрасывает исключение
-    mock_get_datetime.side_effect = ValueError("Invalid timezone specified")
+    # Инструмент (запись в TOOL_MAPPING) выбрасывает исключение
+    def boom(**kwargs):
+        raise ValueError("Invalid timezone specified")
 
-    events = list(run_cycle(initial_messages))
+    with patch.dict('ai.tools.TOOL_MAPPING', {'get_datetime': boom}):
+        events = list(run_cycle(initial_messages))
 
     # Цикл НЕ прервался: есть финальный ответ
     final_events = [e for e in events if e['type'] == 'final_answer']
