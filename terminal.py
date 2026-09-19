@@ -196,7 +196,11 @@ def main():
                         print(palette.yellow + t('terminal_tool_call', name=event['data']['name'], args=args_str) + palette.normal)
                     elif event['type'] == 'tool_result':
                         result_preview = json.dumps(event['data']['result'], ensure_ascii=False)[:200]
-                        print(palette.green + t('terminal_tool_result', name=event['data']['name'], result=result_preview) + palette.normal)
+                        if event['data'].get('error'):
+                            # Ошибка инструмента — выводим красным
+                            print(palette.red + t('terminal_tool_error', name=event['data']['name'], result=result_preview) + palette.normal)
+                        else:
+                            print(palette.green + t('terminal_tool_result', name=event['data']['name'], result=result_preview) + palette.normal)
                     elif event['type'] == 'final_answer':
                         print(palette.white + t('terminal_final_answer') + palette.normal)
                         print(palette.white + event['data']['content'] + palette.normal)

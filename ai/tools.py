@@ -366,6 +366,10 @@ tools = [
                     "path": {
                         "type": "string",
                         "description": 'Path to get the file list of, "" is the root path, defaults to "".'
+                    },
+                    "branch": {
+                        "type": "string",
+                        "description": 'The branch name you want to get the file list of. Defaults to main if not given.'
                     }
                 },
                 "required": ["repo"]
@@ -386,10 +390,14 @@ tools = [
                     },
                     "path": {
                         "type": "string",
-                        "description": 'Path to get the file list of, "" is the root path, defaults to "".'
+                        "description": 'Path to read the file from.'
+                    },
+                    "branch": {
+                        "type": "string",
+                        "description": 'The branch name you want to read the file from. Defaults to main if not given.'
                     }
                 },
-                "required": ["repo"]
+                "required": ["repo", "path"]
             }
         }
     },
@@ -416,6 +424,10 @@ tools = [
                     "message": {
                         "type": "string",
                         "description": 'The commit message.'
+                    },
+                    "branch": {
+                        "type": "string",
+                        "description": 'The branch name you want to write the file in. Defaults to main if not given.'
                     }
                 },
                 "required": ["repo", "path", "content"]
