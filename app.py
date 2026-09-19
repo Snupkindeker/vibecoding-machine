@@ -339,6 +339,11 @@ if prompt := st.chat_input(t("prompt_field")):
         st.session_state.messages.append(user_msg)
         st.session_state.thinking_steps = []
 
+        # Сразу показываем сообщение пользователя, чтобы его было видно
+        # во время "мышления" модели (а не только после завершения).
+        with st.chat_message("user"):
+            st.write(prompt)
+
         with st.status(t('thinking_start'), expanded=True) as status:
             for event in run_cycle(st.session_state.messages):
                 if event['type'] == 'llm_call':
